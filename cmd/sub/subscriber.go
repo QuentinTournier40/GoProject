@@ -4,22 +4,23 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
+	"sync"
 	"time"
 )
 
-var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	//fmt.Printf("Message reçu: %s from topic: %s\n", msg.Payload(), msg.Topic())
-	fmt.Println("test")
-}
-
 func main() {
-	fmt.Println("Hello world!")
-	//topic := "test"
-	//client := connect("tcp://localhost:1883", "test-client")
+	topic := "test"
+	client := connect("tcp://localhost:1883", "test-client")
 
-	/*client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-		fmt.Printf("* [%s] %s\n", msg.Topic(), string(msg.Payload()))
-	})*/
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+		//Get the Kuzzle response
+		fmt.Println("Message reçu : " + string(msg.Payload()))
+	})
+
+	wg.Wait()
 }
 
 func createClientOptions(brokerURI string, clientId string) *mqtt.ClientOptions {

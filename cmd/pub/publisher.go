@@ -10,7 +10,7 @@ import (
 func main() {
 	topic := "test"
 	msg := "Hello world!"
-	client := connect("tcp://localhost:1883", "test-client")
+	client := connect("tcp://localhost:1883", "publish")
 	client.Publish(topic, 0, false, msg)
 	fmt.Println("==============================\n" +
 		"Message envoyé au sujet: " + topic +
