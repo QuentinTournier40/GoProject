@@ -9,27 +9,32 @@ import (
 )
 
 func main() {
-	configuration := config.GetConfig()
-	fmt.Println(configuration.ADDRESS)
+
+	configuration := config.GetConfig("Pressure")
+	address := configuration.ADDRESS
+	port := configuration.PORT
+	qos := configuration.QOS
+	clientId := configuration.CLIENT_ID
+	delay := configuration.DELAY
+
+	fmt.Println(delay)
 
 	topic := "test"
-	msg := "Hello world!"
-	client := connect("tcp://localhost:1883", "publish")
-	client.Publish(topic, 0, false, msg)
-	fmt.Println("==============================\n" +
-		"Message envoyé au sujet: " + topic +
-		"\n==============================\n")
+	msg := "Pressure!"
+	client := connect(address+":"+port, clientId)
+
+	for {
+		client.Publish(topic, qos, false, msg)
+		fmt.Println("==============================\n" +
+			"Message envoyé au sujet: " + topic +
+			"\n==============================\n")
+		time.Sleep(3 * time.Second)
+	}
 }
 
 func createClientOptions(brokerURI string, clientId string) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
-	// AddBroker adds a broker URI to the list of brokers to be used.
-	// The format should be "scheme://host:port"
 	opts.AddBroker(brokerURI)
-	//
-	//opts.SetUsername(user)
-	////
-	//opts.SetPassword(password)
 	opts.SetClientID(clientId)
 	return opts
 }

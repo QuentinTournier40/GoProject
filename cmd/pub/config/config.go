@@ -8,17 +8,15 @@ import (
 type Configuration struct {
 	ADDRESS   string
 	PORT      string
-	QOS       string
+	QOS       byte
 	CLIENT_ID string
+	DELAY     int
 }
 
-func GetConfig(params ...string) Configuration {
+func GetConfig(file string) Configuration {
 	configuration := Configuration{}
-	env := "dev"
-	if len(params) > 0 {
-		env = params[0]
-	}
-	fileName := fmt.Sprintf("./%s_config.json", env)
+
+	fileName := fmt.Sprintf("./cmd/pub/config/%s_config.json", file)
 	gonfig.GetConf(fileName, &configuration)
 	return configuration
 }
