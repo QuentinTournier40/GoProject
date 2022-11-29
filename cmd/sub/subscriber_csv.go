@@ -3,20 +3,25 @@ package main
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"log"
-	"time"
+	"sync"
 )
 
 func main() {
 	topic := "test"
-	msg := "Hello world!"
-	client := connect("tcp://localhost:1883", "publish")
-	client.Publish(topic, 0, false, msg)
-	fmt.Println("==============================\n" +
-		"Message envoyé au sujet: " + topic +
-		"\n==============================\n")
+	client := connect("tcp://localhost:1883", "test-client")
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+		//Get the Kuzzle response
+		fmt.Println("Message reçu : " + string(msg.Payload()))
+	})
+
+	wg.Wait()
 }
 
+/*
 func createClientOptions(brokerURI string, clientId string) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
 	// AddBroker adds a broker URI to the list of brokers to be used.
@@ -42,3 +47,4 @@ func connect(brokerURI string, clientId string) mqtt.Client {
 	}
 	return client
 }
+*/
