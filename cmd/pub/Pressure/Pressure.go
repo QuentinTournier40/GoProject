@@ -19,15 +19,13 @@ func main() {
 
 	fmt.Println(delay)
 
-	topic := "test"
-	msg := "Pressure!"
+	topic := "capteurs"
 	client := connect(address+":"+port, clientId)
 
 	for {
+		now := time.Now()
+		msg := "2 LYN PRESSURE " + "valeur" + " " + now.Format("2006-02-01-15-04-05")
 		client.Publish(topic, qos, false, msg)
-		fmt.Println("==============================\n" +
-			"Message envoyé au sujet: " + topic +
-			"\n==============================\n")
 		time.Sleep(3 * time.Second)
 	}
 }

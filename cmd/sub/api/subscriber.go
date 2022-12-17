@@ -3,11 +3,15 @@ package main
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"goproject/bdd"
+	"log"
+	"strings"
 	"sync"
+	"time"
 )
 
 func main() {
-	topic := "test"
+	topic := "capteurs"
 	client := connect("tcp://localhost:1883", "test-client")
 
 	var wg sync.WaitGroup
@@ -15,13 +19,18 @@ func main() {
 
 	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
 		//Get the Kuzzle response
-		fmt.Println("Message reçu : " + string(msg.Payload()))
+		//fmt.Println(string(msg.Payload()))
+		table := strings.Split(string(msg.Payload()), " ")
+
+		fmt.Println(table[1])
+		key := table[1] + "/" + table[2] + "/" + table[4]
+		bdd.SetValue(key, table[3])
+
 	})
 
 	wg.Wait()
 }
 
-/*
 func createClientOptions(brokerURI string, clientId string) *mqtt.ClientOptions {
 	opts := mqtt.NewClientOptions()
 	// AddBroker adds a broker URI to the list of brokers to be used.
@@ -47,4 +56,3 @@ func connect(brokerURI string, clientId string) mqtt.Client {
 	}
 	return client
 }
-*/
