@@ -2,9 +2,8 @@ package Captors
 
 import (
 	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"goproject/cmd/PubSubMethods"
 	"goproject/cmd/pub/config"
-	"log"
 	"math/rand"
 	"time"
 )
@@ -21,7 +20,7 @@ func RunCaptor(captorFileName, captorFullNameUpperCase, captorId string, minValu
 	delay := configuration.DELAY
 
 	topic := "capteurs"
-	client := connectClient(address+":"+port, clientId, delay)
+	client := PubSubMethods.Connect(address+":"+port, clientId, delay)
 
 	mapIata := config.CODE_IATA
 
@@ -42,26 +41,6 @@ func RunCaptor(captorFileName, captorFullNameUpperCase, captorId string, minValu
 		}
 		time.Sleep(time.Duration(delay) * time.Second)
 	}
-}
-
-func createClientOptions(brokerURI, clientId string) *mqtt.ClientOptions {
-	opts := mqtt.NewClientOptions()
-	opts.AddBroker(brokerURI)
-	opts.SetClientID(clientId)
-	return opts
-}
-
-func connectClient(brokerURI, clientId string, delay int) mqtt.Client {
-	fmt.Println("Trying to connect (" + brokerURI + ", " + clientId + ")...")
-	opts := createClientOptions(brokerURI, clientId)
-	client := mqtt.NewClient(opts)
-	token := client.Connect()
-	for !token.WaitTimeout(time.Duration(delay) * time.Second) {
-	}
-	if err := token.Error(); err != nil {
-		log.Fatal(err)
-	}
-	return client
 }
 
 func generateCoherenteValue(value float64) float64 {

@@ -4,15 +4,15 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"goproject/bdd"
-	"log"
+	"goproject/cmd/PubSubMethods"
 	"strings"
 	"sync"
-	"time"
 )
 
 func RunSubscriber(clientId string, isForApi bool) {
 	topic := "capteurs"
-	client := connect("tcp://localhost:1883", clientId)
+	// TODO REMOVE 3 AND ADD REAL DELAY FROM CONFIG
+	client := PubSubMethods.Connect("tcp://localhost:1883", clientId, 3)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -29,24 +29,4 @@ func RunSubscriber(clientId string, isForApi bool) {
 		}
 	})
 	wg.Wait()
-}
-
-func createClientOptions(brokerURI string, clientId string) *mqtt.ClientOptions {
-	opts := mqtt.NewClientOptions()
-	opts.AddBroker(brokerURI)
-	opts.SetClientID(clientId)
-	return opts
-}
-
-func connect(brokerURI string, clientId string) mqtt.Client {
-	fmt.Println("Trying to connect (" + brokerURI + ", " + clientId + ")...")
-	opts := createClientOptions(brokerURI, clientId)
-	client := mqtt.NewClient(opts)
-	token := client.Connect()
-	for !token.WaitTimeout(3 * time.Second) {
-	}
-	if err := token.Error(); err != nil {
-		log.Fatal(err)
-	}
-	return client
 }
