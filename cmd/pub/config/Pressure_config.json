@@ -1,7 +1,0 @@
-{
-  "ADDRESS": "tcp://localhost",
-  "PORT": "1883",
-  "QOS": 0,
-  "CLIENT_ID": "Pressure",
-  "DELAY": 10
-}

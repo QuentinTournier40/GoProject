@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	Captors.RunCaptor("Temp", "TEMPERATURE", "2", -15, 43)
+	Captors.RunCaptor("TEMPERATURE", "2", -15, 43)
 }

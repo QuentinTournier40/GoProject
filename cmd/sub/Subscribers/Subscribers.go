@@ -5,14 +5,16 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"goproject/bdd"
 	"goproject/cmd/PubSubMethods"
+	"goproject/config"
 	"strings"
 	"sync"
 )
 
 func RunSubscriber(clientId string, isForApi bool) {
+	configuration := config.GetConfig()
 	topic := "capteurs"
 	// TODO REMOVE 3 AND ADD REAL DELAY FROM CONFIG
-	client := PubSubMethods.Connect("tcp://localhost:1883", clientId, 3)
+	client := PubSubMethods.Connect(configuration.ADDRESS+":"+configuration.PORT, clientId, configuration.DELAY)
 
 	var wg sync.WaitGroup
 	wg.Add(1)

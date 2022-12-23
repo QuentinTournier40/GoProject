@@ -3,24 +3,30 @@ package Captors
 import (
 	"fmt"
 	"goproject/cmd/PubSubMethods"
-	"goproject/cmd/pub/config"
+	"goproject/config"
 	"math/rand"
 	"time"
 )
 
-func RunCaptor(captorFileName, captorFullNameUpperCase, captorId string, minValue, maxValue float64) {
+func RunCaptor(captorFullNameUpperCase, captorId string, minValue, maxValue float64) {
 	// GENERATE RANDOM SEED
 	rand.Seed(time.Now().UnixNano())
-	// CONFIG
-	configuration := config.GetConfig(captorFileName)
-	address := configuration.ADDRESS
-	port := configuration.PORT
-	qos := configuration.QOS
-	clientId := configuration.CLIENT_ID
-	delay := configuration.DELAY
+
+	configuration := config.GetConfig()
+	clientId := ""
+	switch captorId {
+	case "1":
+		clientId = configuration.PRESSURE.CLIENT_ID
+
+	case "2":
+		clientId = configuration.TEMPERATURE.CLIENT_ID
+
+	case "3":
+		clientId = configuration.WIND.CLIENT_ID
+	}
 
 	topic := "capteurs"
-	client := PubSubMethods.Connect(address+":"+port, clientId, delay)
+	client := PubSubMethods.Connect(configuration.ADDRESS+":"+configuration.PORT, clientId, configuration.DELAY)
 
 	mapIata := config.CODE_IATA
 
@@ -36,10 +42,10 @@ func RunCaptor(captorFileName, captorFullNameUpperCase, captorId string, minValu
 			tabValue[key] = generateCoherenteValue(tabValue[key])
 			now := time.Now()
 			msg := captorId + " " + value + " " + captorFullNameUpperCase + " " + fmt.Sprintf("%.1f", tabValue[key]) + " " + now.Format("2006-02-01-15-04-05")
-			client.Publish(topic, qos, false, msg)
+			client.Publish(topic, configuration.QOS, false, msg)
 			fmt.Println(msg)
 		}
-		time.Sleep(time.Duration(delay) * time.Second)
+		time.Sleep(time.Duration(configuration.DELAY) * time.Second)
 	}
 }
 

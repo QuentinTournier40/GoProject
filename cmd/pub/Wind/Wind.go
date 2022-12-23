@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	Captors.RunCaptor("Wind", "WIND", "3", 0, 250)
+	Captors.RunCaptor("WIND", "3", 0, 250)
 }

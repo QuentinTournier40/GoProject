@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	Captors.RunCaptor("Pressure", "PRESSURE", "1", 950, 1030)
+	Captors.RunCaptor("PRESSURE", "1", 950, 1030)
 }

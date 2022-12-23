@@ -1,0 +1,9 @@
+{
+  "ADDRESS": "tcp://localhost",
+  "PORT": "1883",
+  "QOS": 0,
+  "DELAY": 10,
+  "PRESSURE": {"CLIENT_ID" : "Pressure"},
+  "TEMPERATURE": {"CLIENT_ID" : "Temp"},
+  "WIND": {"CLIENT_ID" : "Wind"}
+}
