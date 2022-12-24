@@ -1,9 +1,9 @@
 package main
 
 import (
-	"goproject/cmd/pub/Captors"
+	"goproject/cmd/pub/Subscribers"
 )
 
 func main() {
-	Captors.RunCaptor("TEMPERATURE", "2", -15, 43)
+	Subscribers.RunSubscriber("TEMPERATURE", "2", -15, 43)
 }

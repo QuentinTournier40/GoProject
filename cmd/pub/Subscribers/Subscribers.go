@@ -1,4 +1,4 @@
-package Captors
+package Subscribers
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func RunCaptor(captorFullNameUpperCase, captorId string, minValue, maxValue float64) {
+func RunSubscriber(captorFullNameUpperCase, captorId string, minValue, maxValue float64) {
 	// GENERATE RANDOM SEED
 	rand.Seed(time.Now().UnixNano())
 
