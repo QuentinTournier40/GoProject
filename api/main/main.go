@@ -1,7 +1,9 @@
 package main
 
+import "goproject/api/router"
+
 func main() {
-	a := App{}
+	a := router.App{}
 	a.Initialize()
 	a.Run(":8080")
 }

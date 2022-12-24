@@ -1,8 +1,9 @@
-package main
+package test
 
 import (
 	"context"
 	"encoding/json"
+	"goproject/api/router"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +11,7 @@ import (
 	"testing"
 )
 
-var a App
+var a router.App
 
 func TestMain(m *testing.M) {
 	// ...

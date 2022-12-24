@@ -1,9 +1,10 @@
-package main
+package router
 
 import (
 	"encoding/json"
 	"github.com/go-redis/redis/v9"
 	"github.com/gorilla/mux"
+	main "goproject/api/model"
 	"log"
 	"net/http"
 	"strconv"
@@ -31,8 +32,8 @@ func (a *App) Run(addr string) {
 func (a *App) getSensor(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	s := sensor{ID: id}
-	if err := s.getSensor(a.Client); err != nil {
+	s := main.Sensor{ID: id}
+	if err := s.GetSensor(a.Client); err != nil {
 		switch err {
 		case redis.Nil:
 			respondWithError(w, http.StatusNotFound, "Sensor not found")
@@ -53,7 +54,7 @@ func (a *App) getSensors(w http.ResponseWriter, r *http.Request) {
 	if start < 0 {
 		start = 0
 	}
-	sensors, err := getSensors(a.Client)
+	sensors, err := main.GetSensors(a.Client)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
