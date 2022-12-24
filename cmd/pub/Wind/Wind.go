@@ -1,9 +1,9 @@
 package main
 
 import (
-	"goproject/cmd/pub/Subscribers"
+	"goproject/cmd/pub/Publishers"
 )
 
 func main() {
-	Subscribers.RunSubscriber("WIND", "3", 0, 250)
+	Publishers.RunPublisher("WIND", "3", 0, 250)
 }

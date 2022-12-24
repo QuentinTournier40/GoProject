@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-redis/redis/v9"
 	"github.com/gorilla/mux"
-	main "goproject/api/model"
+	"goproject/api/captor"
 	"log"
 	"net/http"
 	"strconv"
@@ -32,7 +32,7 @@ func (a *App) Run(addr string) {
 func (a *App) getSensor(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	s := main.Sensor{ID: id}
+	s := model.Sensor{ID: id}
 	if err := s.GetSensor(a.Client); err != nil {
 		switch err {
 		case redis.Nil:
@@ -54,7 +54,7 @@ func (a *App) getSensors(w http.ResponseWriter, r *http.Request) {
 	if start < 0 {
 		start = 0
 	}
-	sensors, err := main.GetSensors(a.Client)
+	sensors, err := model.GetSensors(a.Client)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
