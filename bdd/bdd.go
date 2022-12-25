@@ -1,7 +1,6 @@
 package bdd
 
 import (
-	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"log"
 )
@@ -15,6 +14,44 @@ func SetValue(key string, value string) {
 
 	defer conn.Close()
 
-	r, err := redis.String(conn.Do("SET", key, value))
-	fmt.Println(r)
+	_, err = redis.String(conn.Do("SET", key, value))
+}
+
+func GetValue(key string) string {
+	conn, err := redis.Dial("tcp", "localhost:6379")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer conn.Close()
+
+	r, err := redis.String(conn.Do("GET", key))
+	return r
+}
+
+func GetAllKey() []string {
+	conn, err := redis.Dial("tcp", "localhost:6379")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer conn.Close()
+
+	r, err := redis.Strings(conn.Do("KEYS", "*"))
+	return r
+}
+
+func GetAllKeyRegex(expression string) []string {
+	conn, err := redis.Dial("tcp", "localhost:6379")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer conn.Close()
+
+	r, err := redis.Strings(conn.Do("KEYS", expression+"*"))
+	return r
 }

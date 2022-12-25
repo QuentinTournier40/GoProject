@@ -27,7 +27,7 @@ func RunSubscriber(clientId string, isForApi bool) {
 			bdd.SetValue(key, table[3])
 		} else {
 			// ECRITURE DANS LE FICHIER CSV
-			fmt.Println("J'ecris dans le csv")
+			fmt.Println("J'ecris dans le subscriber_csv")
 		}
 	})
 	wg.Wait()
