@@ -11,7 +11,7 @@ func HandleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/get/all-data", captorService.GetDataFromAllCaptors).Methods("GET")
 	myRouter.HandleFunc("/get/data-by-iata-code/{iataCode}", captorService.GetDataByIataCode).Methods("GET")
-	myRouter.HandleFunc("/get/data-by-captorService/{captorName}", captorService.GetDataByCaptor).Methods("GET")
+	myRouter.HandleFunc("/get/data-by-captorName/{captorName}", captorService.GetDataByCaptor).Methods("GET")
 	myRouter.HandleFunc("/get/{iataCode}/{captorName}", captorService.GetDataByIataCodeAndCaptor).Methods("GET")
 	myRouter.HandleFunc("/get/{iataCode}/{captorName}/{year}", captorService.GetDataByIataCodeAndCaptorAndYear).Methods("GET")
 	myRouter.HandleFunc("/get/{iataCode}/{captorName}/{year}/{month}", captorService.GetDataByIataCodeAndCaptorAndYearAndMonth).Methods("GET")

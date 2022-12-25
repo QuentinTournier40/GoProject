@@ -34,6 +34,17 @@ type DataMeasure struct {
 	VALUE string `json:"value"`
 }
 
+type DataCaptor struct {
+	CAPTORNAME string                 `json:"captorName"`
+	VALUES     []*DataMeasureCodeIata `json:"values"`
+}
+
+type DataMeasureCodeIata struct {
+	IATA  string `json:"iata"`
+	DATE  string `json:"date"`
+	VALUE string `json:"value"`
+}
+
 func GetDataFromAllCaptors(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var dataValues []*Data
@@ -54,9 +65,9 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	var pressureData []*DataMeasure
 	var temperatureData []*DataMeasure
 	var windData []*DataMeasure
-	keysPressure := bdd.GetAllKeyRegex(iataCode + "/PRESSURE")
-	keysTemperature := bdd.GetAllKeyRegex(iataCode + "/TEMPERATURE")
-	keysWind := bdd.GetAllKeyRegex(iataCode + "/WIND")
+	keysPressure := bdd.GetAllKeyRegex(iataCode + "/PRESSURE/*")
+	keysTemperature := bdd.GetAllKeyRegex(iataCode + "/TEMPERATURE/*")
+	keysWind := bdd.GetAllKeyRegex(iataCode + "/WIND/*")
 	for _, key := range keysPressure {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
@@ -77,7 +88,27 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Get data from one captorService")
+	w.Header().Set("Content-Type", "application/json")
+	vars := mux.Vars(r)
+	captorName := vars["captorName"]
+	var captorData []*DataMeasureCodeIata
+	var keys []string
+	switch strings.ToLower(captorName) {
+	case "pressure":
+		keys = bdd.GetAllKeyRegex("*/PRESSURE/*")
+	case "temperature":
+		keys = bdd.GetAllKeyRegex("*/TEMPERATURE/*")
+	case "wind":
+		keys = bdd.GetAllKeyRegex("*/WIND/*")
+	}
+
+	for _, key := range keys {
+		data := bdd.GetValue(key)
+		splitKey := strings.Split(key, "/")
+		captorData = append(captorData, &DataMeasureCodeIata{IATA: splitKey[0], DATE: splitKey[2], VALUE: data})
+	}
+	p, _ := json.Marshal(DataCaptor{CAPTORNAME: captorName, VALUES: captorData})
+	w.Write(p)
 }
 
 func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {

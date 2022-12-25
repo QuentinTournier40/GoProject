@@ -52,6 +52,6 @@ func GetAllKeyRegex(expression string) []string {
 
 	defer conn.Close()
 
-	r, err := redis.Strings(conn.Do("KEYS", expression+"*"))
+	r, err := redis.Strings(conn.Do("KEYS", expression))
 	return r
 }
