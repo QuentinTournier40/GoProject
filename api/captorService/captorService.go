@@ -2,7 +2,6 @@ package captorService
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"goproject/bdd"
 	"net/http"
@@ -144,13 +143,82 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Get data from one captorService but only in one airport on specific year")
+	w.Header().Set("Content-Type", "application/json")
+	vars := mux.Vars(r)
+	iataCode := vars["iataCode"]
+	captorName := vars["captorName"]
+	year := vars["year"]
+	var captorData []*DataMeasure
+	var keys []string
+	switch strings.ToLower(captorName) {
+	case "pressure":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/PRESSURE/" + year + "-*")
+	case "temperature":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/TEMPERATURE/" + year + "-*")
+	case "wind":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/WIND/" + year + "-*")
+	}
+
+	for _, key := range keys {
+		data := bdd.GetValue(key)
+		splitKey := strings.Split(key, "/")
+		captorData = append(captorData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+	}
+	p, _ := json.Marshal(DataCaptorIataCode{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	w.Write(p)
 }
 
 func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Get data from one captorService but only in one airport on specific year and month")
+	w.Header().Set("Content-Type", "application/json")
+	vars := mux.Vars(r)
+	iataCode := vars["iataCode"]
+	captorName := vars["captorName"]
+	year := vars["year"]
+	month := vars["month"]
+	var captorData []*DataMeasure
+	var keys []string
+	switch strings.ToLower(captorName) {
+	case "pressure":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/PRESSURE/" + year + "-" + month + "-*")
+	case "temperature":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/TEMPERATURE/" + year + "-" + month + "-*")
+	case "wind":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/WIND/" + year + "-" + month + "-*")
+	}
+
+	for _, key := range keys {
+		data := bdd.GetValue(key)
+		splitKey := strings.Split(key, "/")
+		captorData = append(captorData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+	}
+	p, _ := json.Marshal(DataCaptorIataCode{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	w.Write(p)
 }
 
 func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Get data from one captorService but only in one airport on specific year, and day")
+	w.Header().Set("Content-Type", "application/json")
+	vars := mux.Vars(r)
+	iataCode := vars["iataCode"]
+	captorName := vars["captorName"]
+	year := vars["year"]
+	month := vars["month"]
+	day := vars["day"]
+	var captorData []*DataMeasure
+	var keys []string
+	switch strings.ToLower(captorName) {
+	case "pressure":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/PRESSURE/" + year + "-" + month + "-" + day + "-*")
+	case "temperature":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/TEMPERATURE/" + year + "-" + month + "-" + day + "-*")
+	case "wind":
+		keys = bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/WIND/" + year + "-" + month + "-" + day + "-*")
+	}
+
+	for _, key := range keys {
+		data := bdd.GetValue(key)
+		splitKey := strings.Split(key, "/")
+		captorData = append(captorData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+	}
+	p, _ := json.Marshal(DataCaptorIataCode{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	w.Write(p)
 }

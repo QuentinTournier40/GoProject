@@ -41,7 +41,7 @@ func RunPublisher(captorFullNameUpperCase, captorId string, minValue, maxValue f
 		for key, value := range mapIata {
 			tabValue[key] = generateCoherenteValue(tabValue[key])
 			now := time.Now()
-			msg := captorId + " " + value + " " + captorFullNameUpperCase + " " + fmt.Sprintf("%.1f", tabValue[key]) + " " + now.Format("2006-02-01-15-04-05")
+			msg := captorId + " " + value + " " + captorFullNameUpperCase + " " + fmt.Sprintf("%.1f", tabValue[key]) + " " + now.Format("2006-01-02-15-04-05")
 			client.Publish(topic, configuration.QOS, false, msg)
 			fmt.Println(msg)
 		}
