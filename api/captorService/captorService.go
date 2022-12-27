@@ -14,49 +14,42 @@ import (
 
 // ------------------------------ TYPES JSON ------------------------------
 
-type Data struct {
-	IATA         string `json:"iata"`
-	MEASURETYPE  string `json:"measuretype"`
-	MEASUREVALUE string `json:"measurevalue"`
-	MEASUREDATE  string `json:"measuredate"`
+type AllCaptors struct {
+	IATA        string     `json:"iata"`
+	PRESSURE    []*Measure `json:"pressure"`
+	TEMPERATURE []*Measure `json:"temperature"`
+	WIND        []*Measure `json:"wind"`
 }
 
-type DatasIataCode struct {
-	IATA        string         `json:"iata"`
-	PRESSURE    []*DataMeasure `json:"pressure"`
-	TEMPERATURE []*DataMeasure `json:"temperature"`
-	WIND        []*DataMeasure `json:"wind"`
-}
-
-type DataMeasure struct {
+type Measure struct {
 	DATE  string `json:"date"`
 	VALUE string `json:"value"`
 }
 
-type DataCaptor struct {
-	CAPTORNAME string                 `json:"captorName"`
-	VALUES     []*DataMeasureCodeIata `json:"values"`
+type Captor struct {
+	CAPTORNAME string  `json:"captorName"`
+	VALUES     []*Iata `json:"values"`
 }
 
-type DataMeasureCodeIata struct {
-	IATA     string         `json:"iata"`
-	MEASURES []*DataMeasure `json:"measures"`
+type Iata struct {
+	IATA     string     `json:"iata"`
+	MEASURES []*Measure `json:"measures"`
 }
 
-type DataCaptorIataCode struct {
-	IATA       string         `json:"iata"`
-	CAPTORNAME string         `json:"captorName"`
-	VALUES     []*DataMeasure `json:"values"`
+type CaptorAndIata struct {
+	IATA       string     `json:"iata"`
+	CAPTORNAME string     `json:"captorName"`
+	VALUES     []*Measure `json:"values"`
 }
 
-type Beetween struct {
-	START      string                 `json:"start"`
-	END        string                 `json:"end"`
-	CAPTORNAME string                 `json:"captorName"`
-	VALUES     []*DataMeasureCodeIata `json:"values"`
+type BetweenDate struct {
+	START      string  `json:"start"`
+	END        string  `json:"end"`
+	CAPTORNAME string  `json:"captorName"`
+	VALUES     []*Iata `json:"values"`
 }
 
-type Value struct {
+type DateAndAllCaptors struct {
 	DATE        string  `json:"date"`
 	PRESSURE    float64 `json:"pressure"`
 	TEMPERATURE float64 `json:"temperature"`
@@ -71,9 +64,9 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	iataCode := vars["iataCode"]
 
-	var pressureData []*DataMeasure
-	var temperatureData []*DataMeasure
-	var windData []*DataMeasure
+	var pressureData []*Measure
+	var temperatureData []*Measure
+	var windData []*Measure
 
 	keysPressure := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/PRESSURE/*")
 	keysTemperature := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/TEMPERATURE/*")
@@ -82,19 +75,19 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	for _, key := range keysPressure {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		pressureData = append(pressureData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+		pressureData = append(pressureData, &Measure{DATE: splitKey[2], VALUE: data})
 	}
 	for _, key := range keysTemperature {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		temperatureData = append(temperatureData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+		temperatureData = append(temperatureData, &Measure{DATE: splitKey[2], VALUE: data})
 	}
 	for _, key := range keysWind {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		windData = append(windData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+		windData = append(windData, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(DatasIataCode{IATA: iataCode, PRESSURE: pressureData, TEMPERATURE: temperatureData, WIND: windData})
+	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureData, TEMPERATURE: temperatureData, WIND: windData})
 	w.Write(p)
 }
 
@@ -104,8 +97,8 @@ func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	captorName := vars["captorName"]
 
-	var iataData []*DataMeasureCodeIata
-	var mesure []*DataMeasure
+	var iataData []*Iata
+	var mesure []*Measure
 	var keys []string
 
 	mapIata := config.CODE_IATA
@@ -116,12 +109,12 @@ func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 		for _, key := range keys {
 			data := bdd.GetValue(key)
 			splitKey := strings.Split(key, "/")
-			mesure = append(mesure, &DataMeasure{DATE: splitKey[2], VALUE: data})
+			mesure = append(mesure, &Measure{DATE: splitKey[2], VALUE: data})
 		}
-		iataData = append(iataData, &DataMeasureCodeIata{IATA: iata, MEASURES: mesure})
+		iataData = append(iataData, &Iata{IATA: iata, MEASURES: mesure})
 	}
 
-	p, _ := json.Marshal(DataCaptor{CAPTORNAME: captorName, VALUES: iataData})
+	p, _ := json.Marshal(Captor{CAPTORNAME: captorName, VALUES: iataData})
 	w.Write(p)
 }
 
@@ -132,16 +125,16 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 	iataCode := vars["iataCode"]
 	captorName := vars["captorName"]
 
-	var captorData []*DataMeasure
+	var captorData []*Measure
 
 	keys := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/" + strings.ToUpper(captorName) + "/*")
 
 	for _, key := range keys {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		captorData = append(captorData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+		captorData = append(captorData, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(DataCaptorIataCode{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
 	w.Write(p)
 }
 
@@ -153,16 +146,16 @@ func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
 	captorName := vars["captorName"]
 	year := vars["year"]
 
-	var captorData []*DataMeasure
+	var captorData []*Measure
 
 	keys := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/" + strings.ToUpper(captorName) + "/" + year + "-*")
 
 	for _, key := range keys {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		captorData = append(captorData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+		captorData = append(captorData, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(DataCaptorIataCode{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
 	w.Write(p)
 }
 
@@ -175,16 +168,16 @@ func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Re
 	year := vars["year"]
 	month := vars["month"]
 
-	var captorData []*DataMeasure
+	var captorData []*Measure
 
 	keys := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/" + strings.ToUpper(captorName) + "/" + year + "-" + month + "-*")
 
 	for _, key := range keys {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		captorData = append(captorData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+		captorData = append(captorData, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(DataCaptorIataCode{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
 	w.Write(p)
 }
 
@@ -198,16 +191,16 @@ func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *h
 	month := vars["month"]
 	day := vars["day"]
 
-	var captorData []*DataMeasure
+	var captorData []*Measure
 
 	keys := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/" + strings.ToUpper(captorName) + "/" + year + "-" + month + "-" + day + "-*")
 
 	for _, key := range keys {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		captorData = append(captorData, &DataMeasure{DATE: splitKey[2], VALUE: data})
+		captorData = append(captorData, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(DataCaptorIataCode{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
 	w.Write(p)
 }
 
@@ -219,8 +212,8 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	start := vars["start"]
 	end := vars["end"]
 
-	var iataData []*DataMeasureCodeIata
-	var mesure []*DataMeasure
+	var iataData []*Iata
+	var mesure []*Measure
 
 	startDate, _ := time.Parse("2006-01-02-15", start)
 	endDate, _ := time.Parse("2006-01-02-15", end)
@@ -239,13 +232,13 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 			splitKey := strings.Split(key, "/")
 			if splitKey[0] == iata {
 				data := bdd.GetValue(key)
-				mesure = append(mesure, &DataMeasure{DATE: splitKey[2], VALUE: data})
+				mesure = append(mesure, &Measure{DATE: splitKey[2], VALUE: data})
 			}
 		}
-		iataData = append(iataData, &DataMeasureCodeIata{IATA: iata, MEASURES: mesure})
+		iataData = append(iataData, &Iata{IATA: iata, MEASURES: mesure})
 	}
 
-	p, _ := json.Marshal(Beetween{START: start, END: end, CAPTORNAME: captorName, VALUES: iataData})
+	p, _ := json.Marshal(BetweenDate{START: start, END: end, CAPTORNAME: captorName, VALUES: iataData})
 	w.Write(p)
 }
 
@@ -294,6 +287,6 @@ func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 		wi = 0
 	}
 
-	j, _ := json.Marshal(Value{DATE: date, WIND: wi, TEMPERATURE: t, PRESSURE: p})
+	j, _ := json.Marshal(DateAndAllCaptors{DATE: date, WIND: wi, TEMPERATURE: t, PRESSURE: p})
 	w.Write(j)
 }
