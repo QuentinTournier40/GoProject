@@ -2,6 +2,7 @@ package captorService
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"goproject/bdd"
 	"goproject/config"
@@ -62,32 +63,32 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
-	iataCode := vars["iataCode"]
+	iataCode := strings.ToUpper(vars["iataCode"])
 
-	var pressureData []*Measure
-	var temperatureData []*Measure
-	var windData []*Measure
+	var pressureMeasures []*Measure
+	var temperatureMeasures []*Measure
+	var windMeasures []*Measure
 
-	keysPressure := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/PRESSURE/*")
-	keysTemperature := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/TEMPERATURE/*")
-	keysWind := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/WIND/*")
+	keysPressure := bdd.GetAllKeyRegex(iataCode + "/PRESSURE/*")
+	keysTemperature := bdd.GetAllKeyRegex(iataCode + "/TEMPERATURE/*")
+	keysWind := bdd.GetAllKeyRegex(iataCode + "/WIND/*")
 
 	for _, key := range keysPressure {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		pressureData = append(pressureData, &Measure{DATE: splitKey[2], VALUE: data})
+		pressureMeasures = append(pressureMeasures, &Measure{DATE: splitKey[2], VALUE: data})
 	}
 	for _, key := range keysTemperature {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		temperatureData = append(temperatureData, &Measure{DATE: splitKey[2], VALUE: data})
+		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: splitKey[2], VALUE: data})
 	}
 	for _, key := range keysWind {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		windData = append(windData, &Measure{DATE: splitKey[2], VALUE: data})
+		windMeasures = append(windMeasures, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureData, TEMPERATURE: temperatureData, WIND: windData})
+	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
 	w.Write(p)
 }
 
@@ -95,23 +96,22 @@ func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
-	captorName := vars["captorName"]
+	captorName := strings.ToUpper(vars["captorName"])
 
 	var iataData []*Iata
-	var mesure []*Measure
-	var keys []string
+	var measures []*Measure
 
 	mapIata := config.CODE_IATA
 
 	for _, iata := range mapIata {
-		mesure = nil
-		keys = bdd.GetAllKeyRegex(strings.ToUpper(iata) + "/" + strings.ToUpper(captorName) + "/*")
+		measures = nil
+		keys := bdd.GetAllKeyRegex(strings.ToUpper(iata) + "/" + captorName + "/*")
 		for _, key := range keys {
 			data := bdd.GetValue(key)
 			splitKey := strings.Split(key, "/")
-			mesure = append(mesure, &Measure{DATE: splitKey[2], VALUE: data})
+			measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
 		}
-		iataData = append(iataData, &Iata{IATA: iata, MEASURES: mesure})
+		iataData = append(iataData, &Iata{IATA: iata, MEASURES: measures})
 	}
 
 	p, _ := json.Marshal(Captor{CAPTORNAME: captorName, VALUES: iataData})
@@ -122,19 +122,19 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
-	iataCode := vars["iataCode"]
-	captorName := vars["captorName"]
+	iataCode := strings.ToUpper(vars["iataCode"])
+	captorName := strings.ToUpper(vars["captorName"])
 
-	var captorData []*Measure
+	var measures []*Measure
 
-	keys := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/" + strings.ToUpper(captorName) + "/*")
+	keys := bdd.GetAllKeyRegex(iataCode + "/" + captorName + "/*")
 
 	for _, key := range keys {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		captorData = append(captorData, &Measure{DATE: splitKey[2], VALUE: data})
+		measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: measures})
 	w.Write(p)
 }
 
@@ -142,20 +142,20 @@ func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
-	iataCode := vars["iataCode"]
-	captorName := vars["captorName"]
+	iataCode := strings.ToUpper(vars["iataCode"])
+	captorName := strings.ToUpper(vars["captorName"])
 	year := vars["year"]
 
-	var captorData []*Measure
+	var measures []*Measure
 
-	keys := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/" + strings.ToUpper(captorName) + "/" + year + "-*")
+	keys := bdd.GetAllKeyRegex(iataCode + "/" + captorName + "/" + year + "-*")
 
 	for _, key := range keys {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		captorData = append(captorData, &Measure{DATE: splitKey[2], VALUE: data})
+		measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: measures})
 	w.Write(p)
 }
 
@@ -163,21 +163,21 @@ func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
-	iataCode := vars["iataCode"]
-	captorName := vars["captorName"]
+	iataCode := strings.ToUpper(vars["iataCode"])
+	captorName := strings.ToUpper(vars["captorName"])
 	year := vars["year"]
 	month := vars["month"]
 
-	var captorData []*Measure
+	var measures []*Measure
 
-	keys := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/" + strings.ToUpper(captorName) + "/" + year + "-" + month + "-*")
+	keys := bdd.GetAllKeyRegex(iataCode + "/" + captorName + "/" + year + "-" + month + "-*")
 
 	for _, key := range keys {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		captorData = append(captorData, &Measure{DATE: splitKey[2], VALUE: data})
+		measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: measures})
 	w.Write(p)
 }
 
@@ -185,22 +185,22 @@ func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *h
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
-	iataCode := vars["iataCode"]
-	captorName := vars["captorName"]
+	iataCode := strings.ToUpper(vars["iataCode"])
+	captorName := strings.ToUpper(vars["captorName"])
 	year := vars["year"]
 	month := vars["month"]
 	day := vars["day"]
 
-	var captorData []*Measure
+	var measures []*Measure
 
-	keys := bdd.GetAllKeyRegex(strings.ToUpper(iataCode) + "/" + strings.ToUpper(captorName) + "/" + year + "-" + month + "-" + day + "-*")
+	keys := bdd.GetAllKeyRegex(iataCode + "/" + captorName + "/" + year + "-" + month + "-" + day + "-*")
 
 	for _, key := range keys {
 		data := bdd.GetValue(key)
 		splitKey := strings.Split(key, "/")
-		captorData = append(captorData, &Measure{DATE: splitKey[2], VALUE: data})
+		measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
 	}
-	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: captorData})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: measures})
 	w.Write(p)
 }
 
@@ -208,34 +208,34 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
-	captorName := vars["captorName"]
+	captorName := strings.ToUpper(vars["captorName"])
 	start := vars["start"]
 	end := vars["end"]
 
 	var iataData []*Iata
-	var mesure []*Measure
+	var measures []*Measure
+	mapIata := config.CODE_IATA
 
 	startDate, _ := time.Parse("2006-01-02-15", start)
 	endDate, _ := time.Parse("2006-01-02-15", end)
 
 	var keys []string
-	for d := startDate; d.After(endDate) == false; d = d.Add(time.Hour) {
-		t := d.Format("2006-01-02-15")
-		keys = append(keys, bdd.GetAllKeyRegex("*/"+strings.ToUpper(captorName)+"/"+t+"*")...)
+	for date := startDate; date != endDate; date = date.Add(time.Hour) {
+		dateStr := date.Format("2006-01-02-15")
+		keys = append(keys, bdd.GetAllKeyRegex("*/"+captorName+"/"+dateStr+"*")...)
 	}
 
-	mapIata := config.CODE_IATA
-
 	for _, iata := range mapIata {
-		mesure = nil
+		measures = nil
 		for _, key := range keys {
 			splitKey := strings.Split(key, "/")
 			if splitKey[0] == iata {
 				data := bdd.GetValue(key)
-				mesure = append(mesure, &Measure{DATE: splitKey[2], VALUE: data})
+				measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
 			}
+			fmt.Println(len(keys))
 		}
-		iataData = append(iataData, &Iata{IATA: iata, MEASURES: mesure})
+		iataData = append(iataData, &Iata{IATA: iata, MEASURES: measures})
 	}
 
 	p, _ := json.Marshal(BetweenDate{START: start, END: end, CAPTORNAME: captorName, VALUES: iataData})
@@ -248,45 +248,47 @@ func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	date := vars["date"]
 
-	pressureData := 0.0
-	temperatureData := 0.0
-	windData := 0.0
+	pressureSum := 0.0
+	temperatureSum := 0.0
+	windSum := 0.0
 
 	dateDate, _ := time.Parse("2006-01-02", date)
+	dateFormat := dateDate.Format("2006-01-02")
 
-	keysPressure := bdd.GetAllKeyRegex("*/PRESSURE/" + dateDate.Format("2006-01-02") + "*")
-	keysTemperature := bdd.GetAllKeyRegex("*/TEMPERATURE/" + dateDate.Format("2006-01-02") + "*")
-	keysWind := bdd.GetAllKeyRegex("*/WIND/" + dateDate.Format("2006-01-02") + "*")
+	keysPressure := bdd.GetAllKeyRegex("*/PRESSURE/" + dateFormat + "*")
+	keysTemperature := bdd.GetAllKeyRegex("*/TEMPERATURE/" + dateFormat + "*")
+	keysWind := bdd.GetAllKeyRegex("*/WIND/" + dateFormat + "*")
 
 	for _, key := range keysPressure {
 		data := bdd.GetValue(key)
-		chif, _ := strconv.ParseFloat(data, 64)
-		pressureData += chif
+		pressure, _ := strconv.ParseFloat(data, 64)
+		pressureSum += pressure
 	}
 	for _, key := range keysTemperature {
 		data := bdd.GetValue(key)
-		chif, _ := strconv.ParseFloat(data, 64)
-		temperatureData += chif
+		temperature, _ := strconv.ParseFloat(data, 64)
+		temperatureSum += temperature
 	}
 	for _, key := range keysWind {
 		data := bdd.GetValue(key)
-		chif, _ := strconv.ParseFloat(data, 64)
-		windData += chif
+		wind, _ := strconv.ParseFloat(data, 64)
+		windSum += wind
 	}
 
-	p := pressureData / float64(len(keysPressure))
-	if math.IsNaN(p) {
-		p = 0
+	averagePressure := pressureSum / float64(len(keysPressure))
+	averageTemperature := temperatureSum / float64(len(keysTemperature))
+	averageWind := windSum / float64(len(keysWind))
+
+	if math.IsNaN(averagePressure) {
+		averagePressure = math.SmallestNonzeroFloat64
 	}
-	t := temperatureData / float64(len(keysTemperature))
-	if math.IsNaN(t) {
-		t = 0
+	if math.IsNaN(averageTemperature) {
+		averageTemperature = math.SmallestNonzeroFloat64
 	}
-	wi := windData / float64(len(keysWind))
-	if math.IsNaN(wi) {
-		wi = 0
+	if math.IsNaN(averageWind) {
+		averageWind = math.SmallestNonzeroFloat64
 	}
 
-	j, _ := json.Marshal(DateAndAllCaptors{DATE: date, WIND: wi, TEMPERATURE: t, PRESSURE: p})
+	j, _ := json.Marshal(DateAndAllCaptors{DATE: date, WIND: averageWind, TEMPERATURE: averageTemperature, PRESSURE: averagePressure})
 	w.Write(j)
 }
