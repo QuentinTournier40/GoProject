@@ -2,9 +2,9 @@ package captorService
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"goproject/bdd"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -51,6 +51,13 @@ type DataCaptorIataCode struct {
 	IATA       string         `json:"iata"`
 	CAPTORNAME string         `json:"captorName"`
 	VALUES     []*DataMeasure `json:"values"`
+}
+
+type Beetween struct {
+	START      string                 `json:"start"`
+	END        string                 `json:"end"`
+	CAPTORNAME string                 `json:"captorName"`
+	VALUES     []*DataMeasureCodeIata `json:"values"`
 }
 
 func GetDataFromAllCaptors(w http.ResponseWriter, r *http.Request) {
@@ -232,7 +239,7 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	captorName := vars["captorName"]
 	start := vars["start"]
 	end := vars["end"]
-	//var captorData []*DataMeasure
+	var captorData []*DataMeasureCodeIata
 
 	startDate, _ := time.Parse("2006-01-02-15", start)
 	endDate, _ := time.Parse("2006-01-02-15", end)
@@ -244,24 +251,31 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, key := range keys {
-		fmt.Fprintf(w, key)
+		data := bdd.GetValue(key)
+		splitKey := strings.Split(key, "/")
+		captorData = append(captorData, &DataMeasureCodeIata{DATE: splitKey[2], VALUE: data, IATA: splitKey[0]})
 	}
+	p, _ := json.Marshal(Beetween{START: start, END: end, CAPTORNAME: captorName, VALUES: captorData})
+	w.Write(p)
+}
+
+type Value struct {
+	DATE        string  `json:"date"`
+	PRESSURE    float64 `json:"pressure"`
+	TEMPERATURE float64 `json:"temperature"`
+	WIND        float64 `json:"wind"`
 }
 
 func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	date := vars["date"]
-	var pressureData float64 = 0
-	var temperatureData float64 = 0
-	var windData float64 = 0
+	pressureData := 0.0
+	temperatureData := 0.0
+	windData := 0.0
 
-	fmt.Println(date)
 	dateDate, _ := time.Parse("2006-01-02", date)
 
-	fmt.Println(dateDate.String())
-
-	fmt.Println("*/PRESSURE/" + dateDate.Format("2006-01-02") + "*")
 	keysPressure := bdd.GetAllKeyRegex("*/PRESSURE/" + dateDate.Format("2006-01-02") + "*")
 	keysTemperature := bdd.GetAllKeyRegex("*/TEMPERATURE/" + dateDate.Format("2006-01-02") + "*")
 	keysWind := bdd.GetAllKeyRegex("*/WIND/" + dateDate.Format("2006-01-02") + "*")
@@ -269,22 +283,31 @@ func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 		data := bdd.GetValue(key)
 		chif, _ := strconv.ParseFloat(data, 64)
 		pressureData += chif
-		//pressureData = append(pressureData, &DataMeasure{DATE: splitKey[2], VALUE: data})
 	}
 	for _, key := range keysTemperature {
 		data := bdd.GetValue(key)
 		chif, _ := strconv.ParseFloat(data, 64)
 		temperatureData += chif
-		//temperatureData = append(temperatureData, &DataMeasure{DATE: splitKey[2], VALUE: data})
 	}
 	for _, key := range keysWind {
 		data := bdd.GetValue(key)
 		chif, _ := strconv.ParseFloat(data, 64)
 		windData += chif
-
-		//windData = append(windData, &DataMeasure{DATE: splitKey[2], VALUE: data})
 	}
-	fmt.Fprintf(w, fmt.Sprintf("%f", pressureData/float64(len(keysPressure)))+"\n")
-	fmt.Fprintf(w, fmt.Sprintf("%f", temperatureData/float64(len(keysTemperature)))+"\n")
-	fmt.Fprintf(w, fmt.Sprintf("%f", windData/float64(len(keysWind)))+"\n")
+
+	p := pressureData / float64(len(keysPressure))
+	if math.IsNaN(p) {
+		p = 0
+	}
+	t := temperatureData / float64(len(keysTemperature))
+	if math.IsNaN(t) {
+		t = 0
+	}
+	wi := windData / float64(len(keysWind))
+	if math.IsNaN(wi) {
+		wi = 0
+	}
+
+	j, _ := json.Marshal(Value{DATE: date, WIND: wi, TEMPERATURE: t, PRESSURE: p})
+	w.Write(j)
 }
