@@ -16,49 +16,54 @@ import (
 // ------------------------------ TYPES JSON ------------------------------
 
 type AllCaptors struct {
-	IATA        string     `json:"iata"`
-	PRESSURE    []*Measure `json:"pressure"`
-	TEMPERATURE []*Measure `json:"temperature"`
-	WIND        []*Measure `json:"wind"`
+	IATA        string     `json:"iata" example:"CDG" description:"Identifiant d'un aeroport"`
+	PRESSURE    []*Measure `json:"pressure" example:"[{\"date\":\"2022-12-25-12-00-00\", \"value\":\"1015.13\"}]" description:"Liste des valeurs pour les capteurs de pression"`
+	TEMPERATURE []*Measure `json:"temperature" example:"[{\"date\":\"2022-12-25-12-00-00\", \"value\":\"25.5\"}]" description:"Liste des valeurs pour les capteurs de temperature"`
+	WIND        []*Measure `json:"wind" example:"[{\"date\":\"2022-12-25-12-00-00\", \"value\":\"60.6\"}]" description:"Liste des valeurs pour les capteurs de vitesse du vent"`
 }
 
 type Measure struct {
-	DATE  string `json:"date"`
-	VALUE string `json:"value"`
+	DATE  string `json:"date" example:"2022-12-25-12-00-00" description:"Date (YYYY-MM-DD-HH-MM-SS) de l'enregistrement de la valeur"`
+	VALUE string `json:"value" example:"25.8" description:"Valeur enregistré par le capteur"`
 }
 
 type Captor struct {
-	CAPTORNAME string  `json:"captorName"`
-	VALUES     []*Iata `json:"values"`
+	CAPTORNAME string  `json:"captorName" example:"pressure" description:"Nom du type du capteur"`
+	VALUES     []*Iata `json:"values" example:"[{\"iata\": \"CDG\", \"measures\":[{\"date\":\"2022-12-25-12-00-00\", \"value\":\"60.6\"}]}]" description:"Liste de code iata et de ses valeurs"`
 }
 
 type Iata struct {
-	IATA     string     `json:"iata"`
-	MEASURES []*Measure `json:"measures"`
+	IATA     string     `json:"iata" example:"CDG" description:"Identifiant d'un aeroport"`
+	MEASURES []*Measure `json:"measures" example:"[{\"date\":\"2022-12-25-12-00-00\", \"value\":\"60.6\"}]" description:"Liste de valeurs d'un capteur"`
 }
 
 type CaptorAndIata struct {
-	IATA       string     `json:"iata"`
-	CAPTORNAME string     `json:"captorName"`
-	VALUES     []*Measure `json:"values"`
+	IATA       string     `json:"iata" example:"CDG" description:"Identifiant d'un aeroport"`
+	CAPTORNAME string     `json:"captorName" example:"pressure" description:"Nom du type du capteur"`
+	VALUES     []*Measure `json:"values" example:"[{\"date\":\"2022-12-25-12-00-00\", \"value\":\"60.6\"}]" description:"Liste de valeurs associé a un code iata et un type de capteur"`
 }
 
 type BetweenDate struct {
-	START      string  `json:"start"`
-	END        string  `json:"end"`
-	CAPTORNAME string  `json:"captorName"`
-	VALUES     []*Iata `json:"values"`
+	START      string  `json:"start" example:"2022-12-25-12" description:"Date (YYYY-MM-DD-HH) du début de la plage horaire"`
+	END        string  `json:"end" example:"2022-12-25-13" description:"Date (YYYY-MM-DD-HH) de la fin de la plage horaire"`
+	CAPTORNAME string  `json:"captorName" example:"pressure" description:"Nom du type du capteur"`
+	VALUES     []*Iata `json:"values" example:"[{\"date\":\"2022-12-25-12-00-00\", \"value\":\"60.6\"}]" description:"Liste de valeurs associé a un code iata et un type de capteur compris dans le plage horaire"`
 }
 
 type DateAndAllCaptors struct {
-	DATE        string  `json:"date"`
-	PRESSURE    float64 `json:"pressure"`
-	TEMPERATURE float64 `json:"temperature"`
-	WIND        float64 `json:"wind"`
+	DATE        string  `json:"date" example:"2022-12-25" description:"Date (YYYY-MM-DD) du jour ou l'on veut connaitre les moyennes des valeurs"`
+	PRESSURE    float64 `json:"pressure" example:"950.12" description:"Valeur moyenne des données de pression"`
+	TEMPERATURE float64 `json:"temperature" example:"25.3" description:"Valeur moyenne des données de temperature"`
+	WIND        float64 `json:"wind" example:"60.2" description:"Valeur moyenne des données de votesse du vent"`
 }
 
 // ------------------------------ SERVICES ------------------------------
 
+// @Title Get all data by iata code
+// @Description Obtenir tous les relevés de mesure selon un code iata.
+// @Param iataCode path string true "Code iata"
+// @Success 200 {object} AllCaptors "AllCaptors JSON"
+// @Route /get/data-by-iata-code/{iataCode} [get]
 func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -92,6 +97,11 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	w.Write(p)
 }
 
+// @Title Get all data by captor
+// @Description Obtenir tous les relevés de mesure d un type de capteur.
+// @Param captorName path string true "Captor name"
+// @Success 200 {object} Captor "Captor JSON"
+// @Route /get/data-by-captorName/{captorName} [get]
 func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -118,6 +128,12 @@ func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 	w.Write(p)
 }
 
+// @Title Get data by iata code and captor name
+// @Description Obtenir tous les relevés de mesure d'un aeroport et d un seul type de capteur.
+// @Param captorName path string true "Captor name"
+// @Param iataCode path string true "Code iata"
+// @Success 200 {object} CaptorAndIata "CaptorAndIata JSON"
+// @Route /get/data/{iataCode}/{captorName} [get]
 func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -138,6 +154,13 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 	w.Write(p)
 }
 
+// @Title Get data by iata code, captor name and year
+// @Description Obtenir tous les relevés de mesure d'un aeroport et d un seul type de capteur d une année precise.
+// @Param captorName path string true "Captor name"
+// @Param iataCode path string true "Code iata"
+// @Param year path string true "Year"
+// @Success 200 {object} CaptorAndIata "CaptorAndIata JSON"
+// @Route /get/data/{iataCode}/{captorName}/{year} [get]
 func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -159,6 +182,14 @@ func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
 	w.Write(p)
 }
 
+// @Title Get data by iata code, captor name, year and month
+// @Description Obtenir tous les relevés de mesure d'un aeroport et d'un seul type de capteur d une année et d un mois precis.
+// @Param captorName path string true "Captor name"
+// @Param iataCode path string true "Code iata"
+// @Param year path string true "Year"
+// @Param month path string true "Month"
+// @Success 200 {object} CaptorAndIata "CaptorAndIata JSON"
+// @Route /get/data/{iataCode}/{captorName}/{year}/{month} [get]
 func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -181,6 +212,15 @@ func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Re
 	w.Write(p)
 }
 
+// @Title Get data by iata code, captor name, year, month and day
+// @Description Obtenir tous les relevés de mesure d un aeroport et d un seul type de capteur d une année, d un mois et d un jour precis.
+// @Param captorName path string true "Captor name"
+// @Param iataCode path string true "Code iata"
+// @Param year path string true "Year"
+// @Param month path string true "Month"
+// @Param day path string true "Day"
+// @Success 200 {object} CaptorAndIata "CaptorAndIata JSON"
+// @Route /get/data/{iataCode}/{captorName}/{year}/{month}/{day} [get]
 func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -204,6 +244,13 @@ func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *h
 	w.Write(p)
 }
 
+// @Title Get data between 2 dates
+// @Description Obtenir tous les relevés de mesure d un type de capteur dans une plage de temps donnée.
+// @Param captorName path string true "Captor name"
+// @Param start path string true "Start"
+// @Param end path string true "End"
+// @Success 200 {object} BetweenDate "CaptorAndIata JSON"
+// @Route /get/data-between-dates/{captorName}/{start}/{end} [get]
 func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -242,6 +289,11 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	w.Write(p)
 }
 
+// @Title Get average data from all captor on specific day
+// @Description Obtenir la moyenne de tous les releves d'un jour donné.
+// @Param date path string true "Date"
+// @Success 200 {object} DateAndAllCaptors "CaptorAndIata JSON"
+// @Route /get/average-data/{date} [get]
 func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

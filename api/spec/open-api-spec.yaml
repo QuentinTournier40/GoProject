@@ -1,0 +1,435 @@
+components:
+  schemas:
+    AllCaptors:
+      properties:
+        iata:
+          description: Identifiant d'un aeroport
+          example: CDG
+          type: string
+        pressure:
+          description: Liste des valeurs pour les capteurs de pression
+          example:
+          - date: 2022-12-25-12-00-00
+            value: "1015.13"
+          items:
+            properties:
+              date:
+                description: Date (YYYY-MM-DD-HH-MM-SS) de l'enregistrement de la
+                  valeur
+                example: 2022-12-25-12-00-00
+                type: string
+              value:
+                description: Valeur enregistré par le capteur
+                example: "25.8"
+                type: string
+            type: object
+          type: array
+        temperature:
+          description: Liste des valeurs pour les capteurs de temperature
+          example:
+          - date: 2022-12-25-12-00-00
+            value: "25.5"
+          items:
+            $ref: '#/components/schemas/Measure'
+          type: array
+        wind:
+          description: Liste des valeurs pour les capteurs de vitesse du vent
+          example:
+          - date: 2022-12-25-12-00-00
+            value: "60.6"
+          items:
+            $ref: '#/components/schemas/Measure'
+          type: array
+      type: object
+    BetweenDate:
+      properties:
+        captorName:
+          description: Nom du type du capteur
+          example: pressure
+          type: string
+        end:
+          description: Date (YYYY-MM-DD-HH) de la fin de la plage horaire
+          example: 2022-12-25-13
+          type: string
+        start:
+          description: Date (YYYY-MM-DD-HH) du début de la plage horaire
+          example: 2022-12-25-12
+          type: string
+        values:
+          description: Liste de valeurs associé a un code iata et un type de capteur
+            compris dans le plage horaire
+          example:
+          - date: 2022-12-25-12-00-00
+            value: "60.6"
+          items:
+            $ref: '#/components/schemas/Iata'
+          type: array
+      type: object
+    Captor:
+      properties:
+        captorName:
+          description: Nom du type du capteur
+          example: pressure
+          type: string
+        values:
+          description: Liste de code iata et de ses valeurs
+          example:
+          - iata: CDG
+            measures:
+            - date: 2022-12-25-12-00-00
+              value: "60.6"
+          items:
+            properties:
+              iata:
+                description: Identifiant d'un aeroport
+                example: CDG
+                type: string
+              measures:
+                description: Liste de valeurs d'un capteur
+                example:
+                - date: 2022-12-25-12-00-00
+                  value: "60.6"
+                items:
+                  $ref: '#/components/schemas/Measure'
+                type: array
+            type: object
+          type: array
+      type: object
+    CaptorAndIata:
+      properties:
+        captorName:
+          description: Nom du type du capteur
+          example: pressure
+          type: string
+        iata:
+          description: Identifiant d'un aeroport
+          example: CDG
+          type: string
+        values:
+          description: Liste de valeurs associé a un code iata et un type de capteur
+          example:
+          - date: 2022-12-25-12-00-00
+            value: "60.6"
+          items:
+            $ref: '#/components/schemas/Measure'
+          type: array
+      type: object
+    DateAndAllCaptors:
+      properties:
+        date:
+          description: Date (YYYY-MM-DD) du jour ou l'on veut connaitre les moyennes
+            des valeurs
+          example: "2022-12-25"
+          type: string
+        pressure:
+          description: Valeur moyenne des données de pression
+          example: 950.12
+          type: number
+        temperature:
+          description: Valeur moyenne des données de temperature
+          example: 25.3
+          type: number
+        wind:
+          description: Valeur moyenne des données de votesse du vent
+          example: 60.2
+          type: number
+      type: object
+    Iata:
+      properties:
+        iata:
+          description: Identifiant d'un aeroport
+          example: CDG
+          type: string
+        measures:
+          description: Liste de valeurs d'un capteur
+          example:
+          - date: 2022-12-25-12-00-00
+            value: "60.6"
+          items:
+            $ref: '#/components/schemas/Measure'
+          type: array
+      type: object
+    Measure:
+      properties:
+        date:
+          description: Date (YYYY-MM-DD-HH-MM-SS) de l'enregistrement de la valeur
+          example: 2022-12-25-12-00-00
+          type: string
+        value:
+          description: Valeur enregistré par le capteur
+          example: "25.8"
+          type: string
+      type: object
+info:
+  contact:
+    email: qttournier@gmail.com
+    name: TOURNIER Quentin
+  description: l'API expose les données generés par nos publishers
+  title: Temperature/Pressure/Wind of airports API
+  version: 1.0.0
+openapi: 3.0.0
+paths:
+  /get/average-data/{date}:
+    get:
+      description: ' Obtenir la moyenne de tous les releves d''un jour donné.'
+      parameters:
+      - description: Date
+        in: path
+        name: date
+        required: true
+        schema:
+          description: Date
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateAndAllCaptors'
+          description: CaptorAndIata JSON
+      summary: Get average data from all captor on specific day
+  /get/data-between-dates/{captorName}/{start}/{end}:
+    get:
+      description: ' Obtenir tous les relevés de mesure d un type de capteur dans
+        une plage de temps donnée.'
+      parameters:
+      - description: Captor name
+        in: path
+        name: captorName
+        required: true
+        schema:
+          description: Captor name
+          format: string
+          type: string
+      - description: Start
+        in: path
+        name: start
+        required: true
+        schema:
+          description: Start
+          format: string
+          type: string
+      - description: End
+        in: path
+        name: end
+        required: true
+        schema:
+          description: End
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetweenDate'
+          description: CaptorAndIata JSON
+      summary: Get data between 2 dates
+  /get/data-by-captorName/{captorName}:
+    get:
+      description: ' Obtenir tous les relevés de mesure d un type de capteur.'
+      parameters:
+      - description: Captor name
+        in: path
+        name: captorName
+        required: true
+        schema:
+          description: Captor name
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Captor'
+          description: Captor JSON
+      summary: Get all data by captor
+  /get/data-by-iata-code/{iataCode}:
+    get:
+      description: ' Obtenir tous les relevés de mesure selon un code iata.'
+      parameters:
+      - description: Code iata
+        in: path
+        name: iataCode
+        required: true
+        schema:
+          description: Code iata
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllCaptors'
+          description: AllCaptors JSON
+      summary: Get all data by iata code
+  /get/data/{iataCode}/{captorName}:
+    get:
+      description: ' Obtenir tous les relevés de mesure d''un aeroport et d un seul
+        type de capteur.'
+      parameters:
+      - description: Captor name
+        in: path
+        name: captorName
+        required: true
+        schema:
+          description: Captor name
+          format: string
+          type: string
+      - description: Code iata
+        in: path
+        name: iataCode
+        required: true
+        schema:
+          description: Code iata
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptorAndIata'
+          description: CaptorAndIata JSON
+      summary: Get data by iata code and captor name
+  /get/data/{iataCode}/{captorName}/{year}:
+    get:
+      description: ' Obtenir tous les relevés de mesure d''un aeroport et d un seul
+        type de capteur d une année precise.'
+      parameters:
+      - description: Captor name
+        in: path
+        name: captorName
+        required: true
+        schema:
+          description: Captor name
+          format: string
+          type: string
+      - description: Code iata
+        in: path
+        name: iataCode
+        required: true
+        schema:
+          description: Code iata
+          format: string
+          type: string
+      - description: Year
+        in: path
+        name: year
+        required: true
+        schema:
+          description: Year
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptorAndIata'
+          description: CaptorAndIata JSON
+      summary: Get data by iata code, captor name and year
+  /get/data/{iataCode}/{captorName}/{year}/{month}:
+    get:
+      description: ' Obtenir tous les relevés de mesure d''un aeroport et d''un seul
+        type de capteur d une année et d un mois precis.'
+      parameters:
+      - description: Captor name
+        in: path
+        name: captorName
+        required: true
+        schema:
+          description: Captor name
+          format: string
+          type: string
+      - description: Code iata
+        in: path
+        name: iataCode
+        required: true
+        schema:
+          description: Code iata
+          format: string
+          type: string
+      - description: Year
+        in: path
+        name: year
+        required: true
+        schema:
+          description: Year
+          format: string
+          type: string
+      - description: Month
+        in: path
+        name: month
+        required: true
+        schema:
+          description: Month
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptorAndIata'
+          description: CaptorAndIata JSON
+      summary: Get data by iata code, captor name, year and month
+  /get/data/{iataCode}/{captorName}/{year}/{month}/{day}:
+    get:
+      description: ' Obtenir tous les relevés de mesure d un aeroport et d un seul
+        type de capteur d une année, d un mois et d un jour precis.'
+      parameters:
+      - description: Captor name
+        in: path
+        name: captorName
+        required: true
+        schema:
+          description: Captor name
+          format: string
+          type: string
+      - description: Code iata
+        in: path
+        name: iataCode
+        required: true
+        schema:
+          description: Code iata
+          format: string
+          type: string
+      - description: Year
+        in: path
+        name: year
+        required: true
+        schema:
+          description: Year
+          format: string
+          type: string
+      - description: Month
+        in: path
+        name: month
+        required: true
+        schema:
+          description: Month
+          format: string
+          type: string
+      - description: Day
+        in: path
+        name: day
+        required: true
+        schema:
+          description: Day
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptorAndIata'
+          description: CaptorAndIata JSON
+      summary: Get data by iata code, captor name, year, month and day
+servers:
+- description: Default Server URL
+  url: /
