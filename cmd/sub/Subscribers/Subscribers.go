@@ -13,7 +13,6 @@ import (
 func RunSubscriber(clientId string, isForApi bool) {
 	configuration := config.GetConfig()
 	topic := "capteurs"
-	// TODO REMOVE 3 AND ADD REAL DELAY FROM CONFIG
 	client := PubSubMethods.Connect(configuration.ADDRESS+":"+configuration.PORT, clientId, configuration.DELAY)
 
 	var wg sync.WaitGroup

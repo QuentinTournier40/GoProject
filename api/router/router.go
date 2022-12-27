@@ -9,7 +9,6 @@ import (
 
 func HandleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/get/all-data", captorService.GetDataFromAllCaptors).Methods("GET")
 	myRouter.HandleFunc("/get/data-by-iata-code/{iataCode}", captorService.GetDataByIataCode).Methods("GET")
 	myRouter.HandleFunc("/get/data-by-captorName/{captorName}", captorService.GetDataByCaptor).Methods("GET")
 	myRouter.HandleFunc("/get/data-between-dates/{captorName}/{start}/{end}", captorService.GetDataBetweenDates).Methods("GET")
