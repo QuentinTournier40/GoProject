@@ -22,7 +22,7 @@ func RunSubscriber(clientId string, isForApi bool) {
 		if isForApi {
 			table := strings.Split(string(msg.Payload()), " ")
 			fmt.Println(table[1])
-			key := table[1] + "/" + table[2] + "/" + table[4]
+			key := table[1] + "/" + table[2] + "/" + table[4] + "/" + table[0]
 			bdd.SetValue(key, table[3])
 		} else {
 			// ECRITURE DANS LE FICHIER CSV

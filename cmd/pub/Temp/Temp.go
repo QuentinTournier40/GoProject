@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	Publishers.RunPublisher("TEMPERATURE", "2", -15, 43)
+	Publishers.RunPublisher("TEMPERATURE", 1, -15, 43)
 }

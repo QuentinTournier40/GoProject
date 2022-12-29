@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	Publishers.RunPublisher("PRESSURE", "1", 950, 1030)
+	Publishers.RunPublisher("PRESSURE", 0, 950, 1030)
 }
