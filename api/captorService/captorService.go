@@ -66,6 +66,7 @@ type DateAndAllCaptors struct {
 // @Route /get/data-by-iata-code/{iataCode} [get]
 func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	vars := mux.Vars(r)
 	iataCode := strings.ToUpper(vars["iataCode"])
@@ -104,6 +105,7 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 // @Route /get/data-by-captorName/{captorName} [get]
 func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	vars := mux.Vars(r)
 	captorName := strings.ToUpper(vars["captorName"])
@@ -136,6 +138,7 @@ func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 // @Route /get/data/{iataCode}/{captorName} [get]
 func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	vars := mux.Vars(r)
 	iataCode := strings.ToUpper(vars["iataCode"])
@@ -163,6 +166,7 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 // @Route /get/data/{iataCode}/{captorName}/{year} [get]
 func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	vars := mux.Vars(r)
 	iataCode := strings.ToUpper(vars["iataCode"])
@@ -192,6 +196,7 @@ func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
 // @Route /get/data/{iataCode}/{captorName}/{year}/{month} [get]
 func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	vars := mux.Vars(r)
 	iataCode := strings.ToUpper(vars["iataCode"])
@@ -223,6 +228,7 @@ func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Re
 // @Route /get/data/{iataCode}/{captorName}/{year}/{month}/{day} [get]
 func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	vars := mux.Vars(r)
 	iataCode := strings.ToUpper(vars["iataCode"])
@@ -253,6 +259,7 @@ func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *h
 // @Route /get/data-between-dates/{captorName}/{start}/{end} [get]
 func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	vars := mux.Vars(r)
 	captorName := strings.ToUpper(vars["captorName"])
@@ -296,6 +303,7 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 // @Route /get/average-data/{date} [get]
 func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	vars := mux.Vars(r)
 	date := vars["date"]
