@@ -1,13 +1,17 @@
 package Subscribers
 
 import (
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/go-co-op/gocron"
+	"golang.org/x/exp/maps"
 	"goproject/bdd"
 	"goproject/cmd/PubSubMethods"
 	"goproject/config"
+	"log"
+	"os"
 	"strings"
 	"sync"
+	"time"
 )
 
 func RunSubscriber(clientId string, isForApi bool) {
@@ -18,16 +22,44 @@ func RunSubscriber(clientId string, isForApi bool) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-		if isForApi {
-			table := strings.Split(string(msg.Payload()), " ")
-			fmt.Println(table[1])
-			key := table[1] + "/" + table[2] + "/" + table[4] + "/" + table[0]
-			bdd.SetValue(key, table[3])
-		} else {
-			// ECRITURE DANS LE FICHIER CSV
-			fmt.Println("J'ecris dans le subscriber_csv")
-		}
-	})
+	var mapCsv = map[string][]string{}
+
+	if isForApi {
+		client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+			value := strings.Split(string(msg.Payload()), " ")
+			key := value[1] + "/" + value[2] + "/" + value[4]
+			bdd.SetValue(key, value[3])
+
+		})
+	} else {
+		job := gocron.NewScheduler(time.UTC)
+		// TODO VERIFIER QUE L'HEURE DE BASE C'EST BIEN MINUIT
+		job.Every(1).Day().Do(func() {
+			createCsvFiles(mapCsv)
+		})
+		job.StartAsync()
+
+		client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+			value := strings.Split(string(msg.Payload()), " ")
+			tab := mapCsv[value[1]+"_"+value[2]+"_"+value[4][:10]]
+			tab = append(tab, strings.Join(value, ";"))
+			mapCsv[value[1]+"_"+value[2]+"_"+value[4][:10]] = tab
+		})
+	}
 	wg.Wait()
+}
+
+func createCsvFiles(mapCsv map[string][]string) {
+	for key, value := range mapCsv {
+		csvFile, err := os.Create("./csv/" + key + ".csv")
+		if err != nil {
+			log.Fatalln("Failed creating file : %s", err)
+		}
+		csvFile.WriteString("Identifiant capteur;Code IATA;Intitule du capteur;Valeur;Date;\n")
+		for _, data := range value {
+			csvFile.WriteString(data + ";\n")
+		}
+		csvFile.Close()
+	}
+	maps.Clear(mapCsv)
 }
