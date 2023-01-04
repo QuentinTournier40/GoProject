@@ -13,7 +13,6 @@ func SetValue(key string, value string) {
 	}
 
 	defer conn.Close()
-
 	_, err = redis.String(conn.Do("SET", key, value))
 }
 
