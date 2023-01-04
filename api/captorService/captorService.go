@@ -8,6 +8,7 @@ import (
 	"goproject/internal/config"
 	"math"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -94,6 +95,11 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 		splitKey := strings.Split(key, "/")
 		windMeasures = append(windMeasures, &Measure{DATE: splitKey[2], VALUE: data})
 	}
+
+	sortByDate(pressureMeasures)
+	sortByDate(windMeasures)
+	sortByDate(temperatureMeasures)
+
 	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
 	w.Write(p)
 }
@@ -351,4 +357,12 @@ func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 
 	j, _ := json.Marshal(DateAndAllCaptors{DATE: date, WIND: averageWind, TEMPERATURE: averageTemperature, PRESSURE: averagePressure})
 	w.Write(j)
+}
+
+func sortByDate(tab []*Measure) {
+	sort.Slice(tab, func(i, j int) bool {
+		dateI, _ := time.Parse("2006-01-02-15-04-05", tab[i].DATE)
+		dateJ, _ := time.Parse("2006-01-02-15-04-05", tab[j].DATE)
+		return dateI.Before(dateJ)
+	})
 }
