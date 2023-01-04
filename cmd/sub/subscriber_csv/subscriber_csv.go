@@ -1,7 +1,7 @@
 package main
 
 import (
-	"goproject/cmd/sub/Subscribers"
+	"goproject/internal/Subscribers"
 )
 
 func main() {

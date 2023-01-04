@@ -4,9 +4,9 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron"
 	"golang.org/x/exp/maps"
-	"goproject/bdd"
-	"goproject/cmd/PubSubMethods"
-	"goproject/config"
+	"goproject/internal/PubSubMethods"
+	"goproject/internal/bdd"
+	"goproject/internal/config"
 	"log"
 	"os"
 	"strings"
@@ -29,7 +29,6 @@ func RunSubscriber(clientId string, isForApi bool) {
 			value := strings.Split(string(msg.Payload()), " ")
 			key := value[1] + "/" + value[2] + "/" + value[4]
 			bdd.SetValue(key, value[3])
-
 		})
 	} else {
 		job := gocron.NewScheduler(time.UTC)

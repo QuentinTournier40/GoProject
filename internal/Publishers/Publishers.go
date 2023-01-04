@@ -2,8 +2,8 @@ package Publishers
 
 import (
 	"fmt"
-	"goproject/cmd/PubSubMethods"
-	"goproject/config"
+	"goproject/internal/PubSubMethods"
+	config2 "goproject/internal/config"
 	"math/rand"
 	"strconv"
 	"time"
@@ -13,7 +13,7 @@ func RunPublisher(captorFullNameUpperCase string, captorId int, minValue, maxVal
 	// GENERATE RANDOM SEED
 	rand.Seed(time.Now().UnixNano())
 
-	configuration := config.GetConfig()
+	configuration := config2.GetConfig()
 	clientId := ""
 	switch captorId {
 	case 1:
@@ -27,7 +27,7 @@ func RunPublisher(captorFullNameUpperCase string, captorId int, minValue, maxVal
 	topic := "capteurs"
 	client := PubSubMethods.Connect(configuration.ADDRESS+":"+configuration.PORT, clientId, configuration.DELAY)
 
-	mapIata := config.CODE_IATA
+	mapIata := config2.CODE_IATA
 
 	var tabValue []float64
 

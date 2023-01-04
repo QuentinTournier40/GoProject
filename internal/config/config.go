@@ -20,6 +20,6 @@ type Configuration struct {
 
 func GetConfig() Configuration {
 	configuration := Configuration{}
-	gonfig.GetConf("./config/config.json", &configuration)
+	gonfig.GetConf("../internal/config/config.json", &configuration)
 	return configuration
 }

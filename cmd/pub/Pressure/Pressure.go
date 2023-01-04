@@ -1,7 +1,7 @@
 package main
 
 import (
-	"goproject/cmd/pub/Publishers"
+	"goproject/internal/Publishers"
 )
 
 func main() {
