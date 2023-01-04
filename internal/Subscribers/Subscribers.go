@@ -27,7 +27,7 @@ func RunSubscriber(clientId string, isForApi bool) {
 	if isForApi {
 		client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
 			value := strings.Split(string(msg.Payload()), " ")
-			key := value[1] + "/" + value[2] + "/" + value[4]
+			key := value[1] + "/" + value[2] + "/" + value[4] + "/" + value[0]
 			bdd.SetValue(key, value[3])
 		})
 	} else {
