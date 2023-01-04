@@ -3,7 +3,7 @@
 # Projet
 
 Projet Go réalisé durant l'UE Architectures distribuées.
-Projet visant à découvrir et à approfondir nos connaissances sur la technologie Go.
+Projet visant à découvrir et à approfondir nos connaissances sur la technologie Go et le mécanisme de publication de messages et d’abonnement (publish-subscribe).
 
 ## API Documentation
 
@@ -17,14 +17,14 @@ File Bat
 ```
 
 ## 🛠 Compétences
-[GoLang](https://go.dev/doc/)
-[RediGo](https://github.com/gomodule/redigo)
-[Gorilla Mux](https://github.com/gorilla/mux)
-[GoCron](https://github.com/go-co-op/gocron)
-[Swagger](https://swagger.io/)
-[GoPaho](https://github.com/eclipse/paho.mqtt.golang)
-[JavaScript](https://developer.mozilla.org/fr/docs/Web/JavaScript)
-[HTML](https://developer.mozilla.org/fr/docs/Web/HTML)
+[GoLang](https://go.dev/doc/)   
+[RediGo](https://github.com/gomodule/redigo)      
+[Gorilla Mux](https://github.com/gorilla/mux)   
+[GoCron](https://github.com/go-co-op/gocron)   
+[Swagger](https://swagger.io/)   
+[GoPaho](https://github.com/eclipse/paho.mqtt.golang)   
+[JavaScript](https://developer.mozilla.org/fr/docs/Web/JavaScript)   
+[HTML](https://developer.mozilla.org/fr/docs/Web/HTML)   
 [CSS](https://developer.mozilla.org/fr/docs/Web/CSS)
 
 
