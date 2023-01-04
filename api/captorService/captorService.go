@@ -60,7 +60,7 @@ type DateAndAllCaptors struct {
 // ------------------------------ SERVICES ------------------------------
 
 // @Title Get all data by iata code
-// @Description Obtenir tous les relevés de mesure selon un code iata.
+// @Description Obtenir tous les relevés de mesure selon un code iata
 // @Param iataCode path string true "Code iata"
 // @Success 200 {object} AllCaptors "AllCaptors JSON"
 // @Route /get/data-by-iata-code/{iataCode} [get]
@@ -99,7 +99,7 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Title Get all data by captor
-// @Description Obtenir tous les relevés de mesure d un type de capteur.
+// @Description Obtenir tous les relevés de mesure d'un type de capteur
 // @Param captorName path string true "Captor name"
 // @Success 200 {object} Captor "Captor JSON"
 // @Route /get/data-by-captorName/{captorName} [get]
