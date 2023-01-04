@@ -6,7 +6,7 @@ start go build -o ./output ./...
 
 cd output
 
-start main.exe
+start api.exe
 start Pressure.exe
 start Temp.exe
 start Wind.exe
