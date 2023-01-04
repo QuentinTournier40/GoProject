@@ -1,7 +1,5 @@
 package config
 
-// TODO PASSER CES TRUC DANS LE FICHIER DE CONFIG
-
 var CODE_IATA = map[int]string{
 	0:  "CDG",
 	1:  "NTS",
