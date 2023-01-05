@@ -104,6 +104,67 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	w.Write(p)
 }
 
+// @Title Get amount of data by iata code
+// @Description Obtenir un nombre donnée de relevés de mesure selon un code iata
+// @Param iataCode path string true "Code iata"
+// @Param number path string true "Nombre"
+// @Success 200 {object} AllCaptors "AllCaptors JSON"
+// @Route /get/data-by-iata-code-and-number/{iataCode}/{number} [get]
+func GetDataByIataCodeForXData(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	vars := mux.Vars(r)
+	iataCode := strings.ToUpper(vars["iataCode"])
+	number, _ := strconv.Atoi(vars["number"])
+
+	var pressureMeasures []*Measure
+	var temperatureMeasures []*Measure
+	var windMeasures []*Measure
+
+	keysPressure := bdd.GetAllKeyRegex(iataCode + "/PRESSURE/*")
+	keysTemperature := bdd.GetAllKeyRegex(iataCode + "/TEMPERATURE/*")
+	keysWind := bdd.GetAllKeyRegex(iataCode + "/WIND/*")
+
+	for _, key := range keysPressure {
+		data := bdd.GetValue(key)
+		splitKey := strings.Split(key, "/")
+		pressureMeasures = append(pressureMeasures, &Measure{DATE: splitKey[2], VALUE: data})
+	}
+	for _, key := range keysTemperature {
+		data := bdd.GetValue(key)
+		splitKey := strings.Split(key, "/")
+		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: splitKey[2], VALUE: data})
+	}
+	for _, key := range keysWind {
+		data := bdd.GetValue(key)
+		splitKey := strings.Split(key, "/")
+		windMeasures = append(windMeasures, &Measure{DATE: splitKey[2], VALUE: data})
+	}
+
+	if len(pressureMeasures) != 0 {
+		sortByDate(pressureMeasures)
+		if number < len(pressureMeasures) {
+			pressureMeasures = pressureMeasures[len(pressureMeasures)-number-1 : len(pressureMeasures)-1]
+		}
+	}
+	if len(temperatureMeasures) != 0 {
+		sortByDate(temperatureMeasures)
+		if number < len(temperatureMeasures) {
+			temperatureMeasures = temperatureMeasures[len(temperatureMeasures)-number-1 : len(temperatureMeasures)-1]
+		}
+	}
+	if len(windMeasures) != 0 {
+		sortByDate(windMeasures)
+		if number < len(windMeasures) {
+			windMeasures = windMeasures[len(windMeasures)-number-1 : len(windMeasures)-1]
+		}
+	}
+
+	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
+	w.Write(p)
+}
+
 // @Title Get all data by captor
 // @Description Obtenir tous les relevés de mesure d'un type de capteur
 // @Param captorName path string true "Captor name"
