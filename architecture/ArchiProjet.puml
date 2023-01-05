@@ -1,0 +1,72 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+interface HTTP
+
+actor User
+package "GoProject" {
+package "API" {
+    [captorService]
+}
+
+package "CMD" {
+    package "Pub" {
+        [Wind]
+        [Temperature]
+        [Pressure]
+
+
+    }
+    package "Sub" {
+        [subscriberApi]
+        [subscriberCsv]
+
+    }
+    interface Broker
+}
+
+package "internal" {
+    [bdd]
+    [config]
+    [Publishers]
+    [Subscribers]
+    [PubSubMethods]
+    note bottom of [config]
+        files in
+        internal package
+        are used by the
+        whole "GoProject"
+    end note
+
+}
+
+}
+
+database "REDIS"{
+    [Data]
+
+}
+
+file "CSV"
+
+User -left- HTTP : "REST/MVC"
+HTTP -down- [captorService] : router
+[captorService] -down-> [Data]: "get"
+
+[subscriberApi] -down-> [Data]: "feed"
+[subscriberCsv] -down-> "CSV": "generate"
+
+[subscriberApi] <-up- "Broker"
+[subscriberCsv] <-up- "Broker"
+"Broker" <-up- [Wind]
+"Broker" <-up- [Pressure]
+"Broker" <-up- [Temperature]
+
+
+
+
+
+
+
+
+@enduml
