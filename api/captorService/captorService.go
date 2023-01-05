@@ -2,7 +2,6 @@ package captorService
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"goproject/internal/bdd"
 	"goproject/internal/config"
@@ -323,21 +322,16 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	startDate, _ := time.Parse("2006-01-02-15", start)
 	endDate, _ := time.Parse("2006-01-02-15", end)
 
-	var keys []string
-	for date := startDate; date != endDate; date = date.Add(time.Hour) {
-		dateStr := date.Format("2006-01-02-15")
-		keys = append(keys, bdd.GetAllKeyRegex("*/"+captorName+"/"+dateStr+"*")...)
-	}
+	startDateUnix := startDate.Unix()
+	endDateUnix := endDate.Unix()
 
 	for _, iata := range mapIata {
 		measures = nil
-		for _, key := range keys {
-			splitKey := strings.Split(key, "/")
-			if splitKey[0] == iata {
-				data := bdd.GetValue(key)
-				measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
-			}
-			fmt.Println(len(keys))
+		for _, value := range bdd.GetValuesBetween2Score(iata+"/"+captorName, startDateUnix, endDateUnix) {
+			splitValue := strings.Split(value, ":")
+			dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
+			date := time.Unix(dateUnixInt, 0)
+			measures = append(measures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
 		}
 		iataData = append(iataData, &Iata{IATA: iata, MEASURES: measures})
 	}
