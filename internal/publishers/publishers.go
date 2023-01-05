@@ -17,11 +17,11 @@ func RunPublisher(captorFullNameUpperCase string, captorId int, minValue, maxVal
 	configuration := config2.GetConfig()
 	clientId := ""
 	switch captorId {
-	case 1:
+	case 0:
 		clientId = configuration.PRESSURE.CLIENT_ID
-	case 2:
+	case 1:
 		clientId = configuration.TEMPERATURE.CLIENT_ID
-	case 3:
+	case 2:
 		clientId = configuration.WIND.CLIENT_ID
 	}
 
