@@ -2,12 +2,12 @@ package captorService
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"goproject/internal/bdd"
 	"goproject/internal/config"
 	"math"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -356,33 +356,45 @@ func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 	temperatureSum := 0.0
 	windSum := 0.0
 
+	cpt1 := 0
+	cpt2 := 0
+	cpt3 := 0
+
 	dateDate, _ := time.Parse("2006-01-02", date)
-	dateFormat := dateDate.Format("2006-01-02")
 
-	keysPressure := bdd.GetAllKeyRegex("*/PRESSURE/" + dateFormat + "*")
-	keysTemperature := bdd.GetAllKeyRegex("*/TEMPERATURE/" + dateFormat + "*")
-	keysWind := bdd.GetAllKeyRegex("*/WIND/" + dateFormat + "*")
+	startDateUnix := dateDate.Unix()
+	endDateUnix := dateDate.Add(time.Hour * 24).Unix()
 
-	for _, key := range keysPressure {
-		data := bdd.GetValue(key)
-		pressure, _ := strconv.ParseFloat(data, 64)
-		pressureSum += pressure
+	for _, key := range bdd.GetAllKeyRegex("*/PRESSURE") {
+		for _, value := range bdd.GetValuesBetween2Score(key, startDateUnix, endDateUnix) {
+			fmt.Println('a')
+			splitValue := strings.Split(value, ":")
+			chiffre, _ := strconv.ParseFloat(splitValue[1], 64)
+			pressureSum += chiffre
+			cpt1 += 1
+		}
 	}
-	for _, key := range keysTemperature {
-		data := bdd.GetValue(key)
-		temperature, _ := strconv.ParseFloat(data, 64)
-		temperatureSum += temperature
+	for _, key := range bdd.GetAllKeyRegex("*/TEMPERATURE") {
+		for _, value := range bdd.GetValuesBetween2Score(key, startDateUnix, endDateUnix) {
+			splitValue := strings.Split(value, ":")
+			chiffre, _ := strconv.ParseFloat(splitValue[1], 64)
+			temperatureSum += chiffre
+			cpt2 += 1
+		}
 	}
-	for _, key := range keysWind {
-		data := bdd.GetValue(key)
-		wind, _ := strconv.ParseFloat(data, 64)
-		windSum += wind
+	for _, key := range bdd.GetAllKeyRegex("*/WIND") {
+		for _, value := range bdd.GetValuesBetween2Score(key, startDateUnix, endDateUnix) {
+			splitValue := strings.Split(value, ":")
+			chiffre, _ := strconv.ParseFloat(splitValue[1], 64)
+			windSum += chiffre
+			cpt3 += 1
+		}
 	}
 
-	averagePressure := pressureSum / float64(len(keysPressure))
-	averageTemperature := temperatureSum / float64(len(keysTemperature))
-	averageWind := windSum / float64(len(keysWind))
-
+	averagePressure := pressureSum / float64(cpt1)
+	averageTemperature := temperatureSum / float64(cpt2)
+	averageWind := windSum / float64(cpt3)
+	//
 	if math.IsNaN(averagePressure) {
 		averagePressure = math.SmallestNonzeroFloat64
 	}
@@ -393,14 +405,8 @@ func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 		averageWind = math.SmallestNonzeroFloat64
 	}
 
+	fmt.Println(averagePressure)
+
 	j, _ := json.Marshal(DateAndAllCaptors{DATE: date, WIND: averageWind, TEMPERATURE: averageTemperature, PRESSURE: averagePressure})
 	w.Write(j)
-}
-
-func sortByDate(tab []*Measure) {
-	sort.Slice(tab, func(i, j int) bool {
-		dateI, _ := time.Parse("2006-01-02-15-04-05", tab[i].DATE)
-		dateJ, _ := time.Parse("2006-01-02-15-04-05", tab[j].DATE)
-		return dateI.Before(dateJ)
-	})
 }
