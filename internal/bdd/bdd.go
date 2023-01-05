@@ -86,9 +86,7 @@ func scanMap(values []interface{}) []string {
 			log.Fatal(err)
 		}
 
-		if len(values) > 0 {
-			results = append(results, value)
-		}
+		results = append(results, value)
 	}
 	return results
 }
