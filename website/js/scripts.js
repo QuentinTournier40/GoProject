@@ -1,114 +1,3 @@
-
-const selectedIata = document.getElementById("selectedIata");
-let temperatureChartObject;
-let pressureChartObject;
-let windChartObject;
-const temperatureChart = document.getElementById('temperatureChart');
-const windChart = document.getElementById('windChart');
-const pressureChart = document.getElementById('pressureChart');
-
-function addData(chart, label, data) {
-    chart.data.labels.push(label);
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(data);
-    });
-    chart.update();
-}
-
-function removeData(chart) {
-    chart.data.labels.splice(0, 1);
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.splice(0, 1);
-    });
-    chart.update();
-}
-
-function loadChart() {
-    getDataByAirport(selectedIata.value).then(data => {
-        temperatureChartObject = new Chart(temperatureChart, {
-            type: 'line',
-            data: {
-                labels: data.temperature.map(function (data) {
-                    return data.date
-                }),
-                datasets: [{
-                    label: 'Temperature',
-                    data: data.temperature.map(function (data) {
-                        return parseFloat(data.value)
-                    }),
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    tension: 0.3
-                },
-                ]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        display: false,
-                        labels: {
-                            color: '#FF000',
-                        }
-                    }
-                }
-            }
-        });
-        windChartObject = new Chart(windChart, {
-            type: 'line',
-            data: {
-                labels: data.wind.map(function (data) {
-                    return data.date
-                }),
-                datasets: [{
-                    label: 'Wind',
-                    data: data.wind.map(function (data) {
-                        return parseFloat(data.value)
-                    }),
-                    borderWidth: 2,
-                    borderColor: '#1ef800',
-                    backgroundColor: '#1ef800',
-                    color: '#1ef800',
-                    pointRadius: 4,
-                    tension: 0.3
-                },
-                ],
-            },
-            options: {
-            }
-        });
-        pressureChartObject = new Chart(pressureChart, {
-            type: 'line',
-            data: {
-                labels: data.pressure.map(function (data) {
-                    return data.date
-                }),
-                datasets: [{
-                    label: 'Pressure',
-                    data: data.pressure.map(function (data) {
-                        return parseFloat(data.value)
-                    }),
-                    borderWidth: 2,
-                    borderColor: '#f80000',
-                    backgroundColor: '#f80000',
-                    color: '#f80000',
-                    pointRadius: 4,
-                    tension: 0.3
-                },
-                ],
-            },
-        });
-
-    });
-
-}
-async function getDataByAirport(iata) {
-    let request = new Request(`http://localhost:8080/get/data-by-iata-code-and-number/${iata}/10`, {
-        method: 'GET',
-        headers: new Headers()
-    });
-    return await fetch(request).then(response => response.json()).then(data => { return { pressure: data.pressure, wind: data.wind, temperature: data.temperature } });
-}
-
 $(function () {
 
     class GaugeChart {
@@ -186,6 +75,152 @@ $(function () {
     }
 
     $(document).ready(function () {
+
+        const selectedIata = document.getElementById("selectedIata");
+        const temperatureChart = document.getElementById('temperatureChart');
+        const windChart = document.getElementById('windChart');
+        const pressureChart = document.getElementById('pressureChart');
+
+        let temperatureChartObject;
+        let pressureChartObject;
+        let windChartObject;
+        // id of the latest setInterval
+        let intervalId;
+
+        // add a point at the end of a chart
+        function addData(chart, label, data) {
+            chart.data.labels.push(label);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            chart.update();
+        }
+
+        // remove latest point of a chart
+        function removeData(chart) {
+            chart.data.labels.splice(0, 1);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.splice(0, 1);
+            });
+            chart.update();
+        }
+
+        // load first chart datas
+        function loadChart() {
+            getDataByAirport(selectedIata.value).then(data => {
+                if (temperatureChartObject) {
+                    temperatureChartObject.destroy();
+                }
+                if (pressureChartObject) {
+                    pressureChartObject.destroy();
+                }
+                if (windChartObject) {
+                    windChartObject.destroy();
+                }
+
+                temperatureChartObject = new Chart(temperatureChart, {
+                    type: 'line',
+                    data: {
+                        labels: data.temperature.map(function (data) {
+                            return data.date
+                        }),
+                        datasets: [{
+                            label: 'Temperature',
+                            data: data.temperature.map(function (data) {
+                                return parseFloat(data.value)
+                            }),
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            tension: 0.3
+                        },
+                        ]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display: false,
+                            }
+                        }
+                    }
+                });
+                windChartObject = new Chart(windChart, {
+                    type: 'line',
+                    data: {
+                        labels: data.wind.map(function (data) {
+                            return data.date
+                        }),
+                        datasets: [{
+                            label: 'Wind',
+                            data: data.wind.map(function (data) {
+                                return parseFloat(data.value)
+                            }),
+                            borderWidth: 2,
+                            borderColor: '#1ef800',
+                            backgroundColor: '#1ef800',
+                            color: '#1ef800',
+                            pointRadius: 4,
+                            tension: 0.3
+                        },
+                        ],
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display: false,
+                            }
+                        }
+                    }
+                });
+                pressureChartObject = new Chart(pressureChart, {
+                    type: 'line',
+                    data: {
+                        labels: data.pressure.map(function (data) {
+                            return data.date
+                        }),
+                        datasets: [{
+                            label: 'Pressure',
+                            data: data.pressure.map(function (data) {
+                                return parseFloat(data.value)
+                            }),
+                            borderWidth: 2,
+                            borderColor: '#f80000',
+                            backgroundColor: '#f80000',
+                            color: '#f80000',
+                            pointRadius: 4,
+                            tension: 0.3
+                        },
+                        ],
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display: false,
+                            }
+                        }
+                    }
+                });
+
+            });
+
+        }
+
+        // get 10 latest values for each 3 captors of the given airport
+        async function getDataByAirport(iata) {
+            let request = new Request(`http://localhost:8080/get/data-by-iata-code-and-number/${iata}/10`, {
+                method: 'GET',
+                headers: new Headers()
+            });
+            return await fetch(request).then(response => response.json()).then(data => { return { pressure: data.pressure, wind: data.wind, temperature: data.temperature } });
+        }
+
+        // when a new airport IATA is selected, we reinitialise the charts
+        function changeAirport() {
+            clearInterval(intervalId);
+            printAirportData();
+        }
+        selectedIata.addEventListener("change", changeAirport);
+
+        // display data of an airport        
         function printAirportData() {
             const selectedIata = document.getElementById("selectedIata");
             getDataByAirport(selectedIata.value).then(value => {
@@ -210,8 +245,12 @@ $(function () {
                     let gauge = new GaugeChart(item, params);
                     gauge.init();
                 });
+
+                // update data of the charts
                 function updateData() {
                     getDataByAirport(selectedIata.value).then(value => {
+
+                        // remove the first point and add a new one at the end
                         if (temperatureChartObject.data.labels.length >= 9) {
                             removeData(temperatureChartObject);
                         }
@@ -224,6 +263,7 @@ $(function () {
                             removeData(pressureChartObject);
                         }
                         addData(pressureChartObject, value.pressure[value.pressure.length - 1].date, value.pressure[value.pressure.length - 1].value);
+
                         $('.gauge').each(function (index, item) {
                             let gauge = $(item).dxCircularGauge('instance');
                             let newValue;
@@ -249,11 +289,10 @@ $(function () {
                     updateData();
                 });
                 loadChart();
-                setInterval(() => { updateData() }, 5000);
+                intervalId = setInterval(() => { updateData() }, 5000);
             });
         }
         printAirportData();
-        selectedIata.addEventListener("change", printAirportData);
     });
 
 
