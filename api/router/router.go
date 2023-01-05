@@ -18,5 +18,6 @@ func HandleRequests() {
 	myRouter.HandleFunc("/get/data/{iataCode}/{captorName}/{year}", captorService.GetDataByIataCodeAndCaptorAndYear).Methods("GET")
 	myRouter.HandleFunc("/get/data/{iataCode}/{captorName}/{year}/{month}", captorService.GetDataByIataCodeAndCaptorAndYearAndMonth).Methods("GET")
 	myRouter.HandleFunc("/get/data/{iataCode}/{captorName}/{year}/{month}/{day}", captorService.GetDataByIataCodeAndCaptorAndYearAndMonthAndDay).Methods("GET")
+	log.Println("Server listening on localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", myRouter))
 }
