@@ -61,6 +61,22 @@ func GetValuesBetween2Index(name string, firstIndex, secondIndex int64) []string
 	return scanMap(r)
 }
 
+func GetValuesBetween2Score(name string, firstScore, secondScore int64) []string {
+	conn, err := redis.Dial("tcp", "localhost:6379")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer conn.Close()
+
+	r, err := redis.Values(conn.Do("ZRANGEBYSCORE", name, firstScore, secondScore))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return scanMap(r)
+}
+
 func GetAllKeyRegex(expression string) []string {
 	conn, err := redis.Dial("tcp", "localhost:6379")
 
