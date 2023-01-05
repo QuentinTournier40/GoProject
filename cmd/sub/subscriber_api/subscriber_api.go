@@ -1,9 +1,9 @@
 package main
 
 import (
-	"goproject/internal/Subscribers"
+	"goproject/internal/subscribers"
 )
 
 func main() {
-	Subscribers.RunSubscriber("client-api", true)
+	subscribers.RunSubscriber("client-api", true)
 }

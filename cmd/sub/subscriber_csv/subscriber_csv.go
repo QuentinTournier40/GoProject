@@ -1,9 +1,9 @@
 package main
 
 import (
-	"goproject/internal/Subscribers"
+	"goproject/internal/subscribers"
 )
 
 func main() {
-	Subscribers.RunSubscriber("client-csv", false)
+	subscribers.RunSubscriber("client-csv", false)
 }

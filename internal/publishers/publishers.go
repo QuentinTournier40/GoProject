@@ -1,9 +1,9 @@
-package Publishers
+package publishers
 
 import (
 	"fmt"
-	"goproject/internal/PubSubMethods"
 	config2 "goproject/internal/config"
+	"goproject/internal/pubSubMethods"
 	"math/rand"
 	"strconv"
 	"time"
@@ -25,7 +25,7 @@ func RunPublisher(captorFullNameUpperCase string, captorId int, minValue, maxVal
 	}
 
 	topic := "capteurs"
-	client := PubSubMethods.Connect(configuration.ADDRESS+":"+configuration.PORT, clientId, configuration.DELAY)
+	client := pubSubMethods.Connect(configuration.ADDRESS+":"+configuration.PORT, clientId, configuration.DELAY)
 
 	mapIata := config2.CODE_IATA
 

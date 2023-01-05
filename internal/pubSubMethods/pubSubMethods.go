@@ -1,4 +1,4 @@
-package PubSubMethods
+package pubSubMethods
 
 import (
 	"fmt"

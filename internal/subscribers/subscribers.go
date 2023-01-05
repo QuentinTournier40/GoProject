@@ -1,12 +1,12 @@
-package Subscribers
+package subscribers
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-co-op/gocron"
 	"golang.org/x/exp/maps"
-	"goproject/internal/PubSubMethods"
 	"goproject/internal/bdd"
 	"goproject/internal/config"
+	"goproject/internal/pubSubMethods"
 	"log"
 	"os"
 	"strings"
@@ -17,7 +17,7 @@ import (
 func RunSubscriber(clientId string, isForApi bool) {
 	configuration := config.GetConfig()
 	topic := "capteurs"
-	client := PubSubMethods.Connect(configuration.ADDRESS+":"+configuration.PORT, clientId, configuration.DELAY)
+	client := pubSubMethods.Connect(configuration.ADDRESS+":"+configuration.PORT, clientId, configuration.DELAY)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
