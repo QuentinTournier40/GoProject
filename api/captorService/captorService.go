@@ -76,29 +76,28 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	var temperatureMeasures []*Measure
 	var windMeasures []*Measure
 
-	keysPressure := bdd.GetAllKeyRegex(iataCode + "/PRESSURE/*")
-	keysTemperature := bdd.GetAllKeyRegex(iataCode + "/TEMPERATURE/*")
-	keysWind := bdd.GetAllKeyRegex(iataCode + "/WIND/*")
+	dataPressure := bdd.GetValuesBetween2Index(iataCode+"/PRESSURE", 0, -1)
+	dataTemperature := bdd.GetValuesBetween2Index(iataCode+"/TEMPERATURE", 0, -1)
+	dataWind := bdd.GetValuesBetween2Index(iataCode+"/WIND", 0, -1)
 
-	for _, key := range keysPressure {
-		data := bdd.GetValue(key)
-		splitKey := strings.Split(key, "/")
-		pressureMeasures = append(pressureMeasures, &Measure{DATE: splitKey[2], VALUE: data})
+	for _, value := range dataPressure {
+		splitValue := strings.Split(value, ":")
+		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
+		date := time.Unix(dateUnixInt, 0)
+		pressureMeasures = append(pressureMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
 	}
-	for _, key := range keysTemperature {
-		data := bdd.GetValue(key)
-		splitKey := strings.Split(key, "/")
-		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: splitKey[2], VALUE: data})
+	for _, value := range dataTemperature {
+		splitValue := strings.Split(value, ":")
+		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
+		date := time.Unix(dateUnixInt, 0)
+		pressureMeasures = append(pressureMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
 	}
-	for _, key := range keysWind {
-		data := bdd.GetValue(key)
-		splitKey := strings.Split(key, "/")
-		windMeasures = append(windMeasures, &Measure{DATE: splitKey[2], VALUE: data})
+	for _, value := range dataWind {
+		splitValue := strings.Split(value, ":")
+		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
+		date := time.Unix(dateUnixInt, 0)
+		pressureMeasures = append(pressureMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
 	}
-
-	sortByDate(pressureMeasures)
-	sortByDate(windMeasures)
-	sortByDate(temperatureMeasures)
 
 	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
 	w.Write(p)
