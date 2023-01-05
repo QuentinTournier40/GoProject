@@ -1,0 +1,90 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>A Basic HTML5 Template</title>
+    <meta name="description" content="A simple HTML5 Template for new projects.">
+    <meta name="author" content="SitePoint">
+
+    <meta property="og:title" content="A Basic HTML5 Template">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.sitepoint.com/a-basic-html5-template/">
+    <meta property="og:description" content="A simple HTML5 Template for new projects.">
+    <meta property="og:image" content="image.png">
+
+    <!-- <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"> -->
+    <link rel="stylesheet" href="css/styles.css?v=1.0">
+</head>
+
+<body>
+    <div id="airportSelector">
+        <label for="pet-select">Choose an airport:</label>
+        <select name="airport" id="selectedIata">
+            <option value="AAA">AAA</option>
+            <option value="AAB">AAB</option>
+            <option value="AAC">AAC</option>
+            <option value="AAD">AAD</option>
+            <option value="AAE">AAE</option>
+            <option value="AAF">AAF</option>
+            <option value="AAG">AAG</option>
+            <option value="AAH">AAH</option>
+            <option value="AAI">AAI</option>
+            <option value="AAJ">AAJ</option>
+            <option value="AAK">AAK</option>
+            <option value="AAL">AAL</option>
+            <option value="AAM">AAM</option>
+            <option value="AAN">AAN</option>
+            <option value="AAO">AAO</option>
+        </select>
+    </div>
+    <main class="main">
+        <button id="random" class="button">Refresh</button>
+        <h1 class="main__title">Airport data</h1>
+
+        <div class="gauge-container">
+            <div class="gauge"></div>
+            <div class="gauge"></div>
+            <div class="gauge"></div>
+        </div>
+    </main>
+    <svg width="0" height="0" version="1.1" class="gradient-mask" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="gradientGauge">
+                <stop class="color-red" offset="0%" />
+                <stop class="color-yellow" offset="17%" />
+                <stop class="color-green" offset="40%" />
+                <stop class="color-yellow" offset="87%" />
+                <stop class="color-red" offset="100%" />
+            </linearGradient>
+        </defs>
+    </svg>
+    <div id="chartsTitles">
+        <h2>Temperature</h2>
+        <h2>Pressure</h2>
+        <h2>Wind</h2>
+    </div>
+    <div id="charts">
+        <canvas id="temperatureChart"></canvas>
+        <canvas id="pressureChart"></canvas>
+        <canvas id="windChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+    <script src="https://cdn3.devexpress.com/jslib/17.1.6/js/dx.all.js"></script>
+    <script src="js/scripts.js"></script>
+
+</body>
+
+</html>

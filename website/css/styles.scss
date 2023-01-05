@@ -1,0 +1,202 @@
+#airport {
+    width: fit-content;
+}
+
+#chartsTitles {
+    display: flex;
+    justify-content: space-around;
+}
+
+#charts {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    canvas {
+        width: 33% !important;
+        height: 400px !important;
+        height: auto;
+    }
+}
+
+#airportSelector {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: auto;
+}
+
+// Vars
+$color--blue-dark: #395467;
+$color--gray: #212629;
+$color--gray-dark: #26323a;
+$color--white: #fff;
+$color--green: #25cd6b;
+$color--green-light: #a7db29;
+$color--yellow: #fbe500;
+$color--red: #e23131;
+$color--orange: #ed811c;
+$unit--spacing: 20px;
+
+
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-image: linear-gradient(140deg, $color--gray, $color--blue-dark);
+    min-height: 100vh;
+    color: $color--white;
+    font-family: 'Open Sans', sans-serif;
+    position: relative;
+    padding-top: $unit--spacing * 4;
+}
+
+a {
+    color: lighten($color--blue-dark, 20%);
+    text-decoration: none;
+}
+
+.color-red {
+    stop-color: $color--red;
+}
+
+.color-yellow {
+    stop-color: $color--yellow;
+}
+
+.color-green {
+    stop-color: $color--green;
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: $color--gray-dark;
+    padding: $unit--spacing;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 3px;
+    word-spacing: 4px;
+
+    a {
+        letter-spacing: 2px;
+        word-spacing: 2px;
+    }
+}
+
+.main {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    &__title {
+        text-align: center;
+        font-size: 48px;
+    }
+}
+
+.gradient-mask {
+    visibility: hidden;
+}
+
+.button {
+    position: absolute;
+    right: $unit--spacing * 2;
+    top: $unit--spacing * 2;
+    border: 2px solid $color--white;
+    background-color: $color--gray-dark;
+    color: $color--white;
+    font-weight: bold;
+    font-size: 16px;
+    padding: $unit--spacing / 2 $unit--spacing;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: .2s;
+
+    &:active {
+        transform: translateY(3px);
+        outline: 0;
+    }
+
+    &:hover,
+    &:focus {
+        outline: 0;
+        background: linear-gradient(-140deg, $color--gray, $color--blue-dark);
+    }
+}
+
+.gauge-container {
+    padding: $unit--spacing;
+    margin-top: $unit--spacing * 4;
+    display: flex;
+    justify-content: space-around;
+}
+
+.gauge {
+    height: 220px;
+    width: 300px;
+
+    .dxg-range.dxg-background-range {
+        fill: url(#gradientGauge);
+    }
+
+    .dxg-line {
+        transform: scaleX(1.04) scaleY(1.03) translate(-4px, -4px);
+
+        path:first-child,
+        path:last-child {
+            display: none;
+        }
+
+        path:nth-child(2),
+        path:nth-child(6) {
+            stroke: $color--orange;
+        }
+
+        path:nth-child(3),
+        path:nth-child(5) {
+            stroke: $color--green-light;
+        }
+
+        path:nth-child(4) {
+            stroke: $color--green;
+        }
+    }
+
+    .dxg-elements {
+        text:first-child {
+            transform: translate(19px, 13px);
+        }
+
+        text:last-child {
+            transform: translate(-27px, 14px);
+        }
+    }
+
+    .dxg-value-indicator {
+        path {
+            transform: scale(1.2) translate(0, -5px);
+            transform-origin: center center;
+        }
+
+        .dxg-title {
+            text-transform: uppercase;
+
+            text:first-child {
+                transform: translateY(5px);
+            }
+        }
+
+        .dxg-spindle-border:nth-child(4),
+        .dxg-spindle-hole:nth-child(5) {
+            transform: translate(0, -109px);
+        }
+
+        .dxg-spindle-hole {
+            fill: $color--gray-dark;
+        }
+    }
+}
