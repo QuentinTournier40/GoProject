@@ -55,6 +55,8 @@ func generateCoherenteValue(value float64, min, max float64) float64 {
 		val = value - randomInterval
 	} else if value+randomInterval < max {
 		val = value + randomInterval
+	} else {
+		val = value
 	}
 	return val
 }
