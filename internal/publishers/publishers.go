@@ -4,6 +4,7 @@ import (
 	"fmt"
 	config2 "goproject/internal/config"
 	"goproject/internal/pubSubMethods"
+	"log"
 	"math/rand"
 	"strconv"
 	"time"
@@ -42,6 +43,7 @@ func RunPublisher(captorFullNameUpperCase string, captorId int, minValue, maxVal
 			now := time.Now()
 			msg := strconv.FormatInt(int64(3*key+captorId), 10) + " " + value + " " + captorFullNameUpperCase + " " + fmt.Sprintf("%.1f", tabValue[key]) + " " + now.Format("2006-01-02-15-04-05")
 			client.Publish(topic, configuration.QOS, false, msg)
+			log.Println(msg)
 		}
 		time.Sleep(time.Duration(configuration.DELAY) * time.Second)
 	}
