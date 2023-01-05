@@ -29,19 +29,6 @@ func GetValue(key string) string {
 	return r
 }
 
-func GetAllKey() []string {
-	conn, err := redis.Dial("tcp", "localhost:6379")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer conn.Close()
-
-	r, err := redis.Strings(conn.Do("KEYS", "*"))
-	return r
-}
-
 func GetAllKeyRegex(expression string) []string {
 	conn, err := redis.Dial("tcp", "localhost:6379")
 
