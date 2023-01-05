@@ -164,7 +164,7 @@ info:
   contact:
     email: qttournier@gmail.com
     name: TOURNIER Quentin
-  description: l'API expose les données generés par nos publishers
+  description: l'API expose les données générées par nos publishers
   title: Temperature/Pressure/Wind of airports API
   version: 1.0.0
 openapi: 3.0.0
@@ -228,7 +228,7 @@ paths:
       summary: Get data between 2 dates
   /get/data-by-captorName/{captorName}:
     get:
-      description: ' Obtenir tous les relevés de mesure d un type de capteur.'
+      description: ' Obtenir tous les relevés de mesure d''un type de capteur'
       parameters:
       - description: Captor name
         in: path
@@ -246,9 +246,37 @@ paths:
                 $ref: '#/components/schemas/Captor'
           description: Captor JSON
       summary: Get all data by captor
+  /get/data-by-iata-code-and-number/{iataCode}/{number}:
+    get:
+      description: ' Obtenir un nombre donnée de relevés de mesure selon un code iata'
+      parameters:
+      - description: Code iata
+        in: path
+        name: iataCode
+        required: true
+        schema:
+          description: Code iata
+          format: string
+          type: string
+      - description: Nombre
+        in: path
+        name: number
+        required: true
+        schema:
+          description: Nombre
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllCaptors'
+          description: AllCaptors JSON
+      summary: Get amount of data by iata code
   /get/data-by-iata-code/{iataCode}:
     get:
-      description: ' Obtenir tous les relevés de mesure selon un code iata.'
+      description: ' Obtenir tous les relevés de mesure selon un code iata'
       parameters:
       - description: Code iata
         in: path
