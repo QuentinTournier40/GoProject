@@ -9,6 +9,7 @@ import (
 	"goproject/internal/pubSubMethods"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -22,30 +23,38 @@ func RunSubscriber(clientId string, isForApi bool) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	var mapCsv = map[string][]string{}
-
 	if isForApi {
-		client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-			value := strings.Split(string(msg.Payload()), " ")
-			key := value[1] + "/" + value[2] + "/" + value[4] + "/" + value[0]
-			bdd.SetValue(key, value[3])
-		})
+		subscribeApi(client, topic)
 	} else {
-		job := gocron.NewScheduler(time.UTC)
-		// TODO VERIFIER QUE L'HEURE DE BASE C'EST BIEN MINUIT
-		job.Every(1).Day().Do(func() {
-			createCsvFiles(mapCsv)
-		})
-		job.StartAsync()
-
-		client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-			value := strings.Split(string(msg.Payload()), " ")
-			tab := mapCsv[value[1]+"_"+value[2]+"_"+value[4][:10]]
-			tab = append(tab, strings.Join(value, ";"))
-			mapCsv[value[1]+"_"+value[2]+"_"+value[4][:10]] = tab
-		})
+		subscribeCsv(client, topic)
 	}
 	wg.Wait()
+}
+
+func subscribeApi(client mqtt.Client, topic string) {
+	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+		strMsg := strings.Split(string(msg.Payload()), " ")
+		date, _ := time.Parse("2006-01-02-15-04-05", strMsg[4])
+		dataRedis := strconv.FormatInt(date.Unix(), 10) + ":" + strMsg[3]
+		bdd.AddToSortedSet(strMsg[1]+"/"+strMsg[2], date.Unix(), dataRedis)
+	})
+}
+
+func subscribeCsv(client mqtt.Client, topic string) {
+	var mapCsv map[string][]string
+
+	job := gocron.NewScheduler(time.UTC)
+	job.Every(1).Day().Do(func() {
+		createCsvFiles(mapCsv)
+	})
+	job.StartAsync()
+
+	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+		strMsg := strings.Split(string(msg.Payload()), " ")
+		tab := mapCsv[strMsg[1]+"_"+strMsg[2]+"_"+strMsg[4][:10]]
+		tab = append(tab, strings.Join(strMsg, ";"))
+		mapCsv[strMsg[1]+"_"+strMsg[2]+"_"+strMsg[4][:10]] = tab
+	})
 }
 
 func createCsvFiles(mapCsv map[string][]string) {
