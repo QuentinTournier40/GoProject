@@ -81,21 +81,15 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 
 	for _, value := range dataPressure {
 		splitValue := strings.Split(value, ":")
-		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
-		date := time.Unix(dateUnixInt, 0)
-		pressureMeasures = append(pressureMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
+		pressureMeasures = append(pressureMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
 	}
 	for _, value := range dataTemperature {
 		splitValue := strings.Split(value, ":")
-		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
-		date := time.Unix(dateUnixInt, 0)
-		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
+		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
 	}
 	for _, value := range dataWind {
 		splitValue := strings.Split(value, ":")
-		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
-		date := time.Unix(dateUnixInt, 0)
-		windMeasures = append(windMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
+		windMeasures = append(windMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
 	}
 
 	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
@@ -126,21 +120,15 @@ func GetDataByIataCodeForXData(w http.ResponseWriter, r *http.Request) {
 
 	for _, value := range dataPressure {
 		splitValue := strings.Split(value, ":")
-		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
-		date := time.Unix(dateUnixInt, 0)
-		pressureMeasures = append(pressureMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
+		pressureMeasures = append(pressureMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
 	}
 	for _, value := range dataTemperature {
 		splitValue := strings.Split(value, ":")
-		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
-		date := time.Unix(dateUnixInt, 0)
-		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
+		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
 	}
 	for _, value := range dataWind {
 		splitValue := strings.Split(value, ":")
-		dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
-		date := time.Unix(dateUnixInt, 0)
-		windMeasures = append(windMeasures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
+		windMeasures = append(windMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
 	}
 
 	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})

@@ -9,7 +9,6 @@ import (
 	"goproject/internal/pubSubMethods"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -35,7 +34,7 @@ func subscribeApi(client mqtt.Client, topic string) {
 	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
 		strMsg := strings.Split(string(msg.Payload()), " ")
 		date, _ := time.Parse("2006-01-02-15-04-05", strMsg[4])
-		dataRedis := strconv.FormatInt(date.Unix(), 10) + ":" + strMsg[3]
+		dataRedis := strMsg[4] + ":" + strMsg[3]
 		bdd.AddToSortedSet(strMsg[1]+"/"+strMsg[2], date.Unix(), dataRedis)
 	})
 }
