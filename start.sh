@@ -1,17 +1,30 @@
 #!/bin/bash
 
-mkdir output
-mkdir csv
+if [ ! -d "output" ]; then
+  mkdir output
+fi
+
+if [ ! -d "csv" ]; then
+  mkdir csv
+fi
+
 start go clean ./...
-start go build -o ./output ./...
-sleep 4
+
+# Exécute la commande "go build" en arrière-plan et enregistre le PID dans une variable
+go build -o ./output ./... &
+pid=$!
+
+# Attend que le processus avec le PID spécifié soit terminé
+wait $pid
+
+# Lance mosquitto
 start mosquitto -v
 
 cd ./output
+files=$(ls)
 
 while [ true ]
 do
-  files=$(ls)
 
   i=0
   for file in $files; do
@@ -31,7 +44,6 @@ do
   # Si l'utilisateur a saisi 0, on exécute tous les fichiers
   if [ $file_number -eq 0 ]
   then
-    echo $files
     for file in $files
     do
       start $file
