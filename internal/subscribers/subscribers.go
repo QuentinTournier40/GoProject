@@ -40,10 +40,10 @@ func subscribeApi(client mqtt.Client, topic string) {
 }
 
 func subscribeCsv(client mqtt.Client, topic string) {
-	var mapCsv map[string][]string
+	var mapCsv = map[string][]string{}
 
 	job := gocron.NewScheduler(time.UTC)
-	job.Every(1).Day().Do(func() {
+	job.Every(10).Minutes().Do(func() {
 		createCsvFiles(mapCsv)
 	})
 	job.StartAsync()
@@ -58,7 +58,7 @@ func subscribeCsv(client mqtt.Client, topic string) {
 
 func createCsvFiles(mapCsv map[string][]string) {
 	for key, value := range mapCsv {
-		csvFile, err := os.Create("./csv/" + key + ".csv")
+		csvFile, err := os.Create("../csv/" + key + ".csv")
 		if err != nil {
 			log.Fatalln("Failed creating file : %s", err)
 		}

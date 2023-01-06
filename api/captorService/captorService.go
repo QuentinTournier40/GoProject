@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"goproject/internal/bdd"
-	"goproject/internal/config"
 	"math"
 	"net/http"
 	"strconv"
@@ -77,9 +76,9 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	dataTemperature := bdd.GetValuesBetween2Index(iataCode+"/TEMPERATURE", 0, -1)
 	dataWind := bdd.GetValuesBetween2Index(iataCode+"/WIND", 0, -1)
 
-	createMeasure(dataPressure, pressureMeasures)
-	createMeasure(dataTemperature, temperatureMeasures)
-	createMeasure(dataWind, windMeasures)
+	pressureMeasures = createMeasure(dataPressure)
+	temperatureMeasures = createMeasure(dataTemperature)
+	windMeasures = createMeasure(dataWind)
 
 	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
 	w.Write(p)
@@ -105,9 +104,9 @@ func GetDataByIataCodeForXData(w http.ResponseWriter, r *http.Request) {
 	dataTemperature := bdd.GetValuesBetween2Index(iataCode+"/TEMPERATURE", -number, -1)
 	dataWind := bdd.GetValuesBetween2Index(iataCode+"/WIND", -number, -1)
 
-	createMeasure(dataPressure, pressureMeasures)
-	createMeasure(dataTemperature, temperatureMeasures)
-	createMeasure(dataWind, windMeasures)
+	pressureMeasures = createMeasure(dataPressure)
+	temperatureMeasures = createMeasure(dataTemperature)
+	windMeasures = createMeasure(dataWind)
 
 	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
 	w.Write(p)
@@ -126,17 +125,13 @@ func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 	var iataData []*Iata
 	var measures []*Measure
 
-	mapIata := config.CODE_IATA
+	tabIata := bdd.GetAllKeyRegex("*/" + captorName)
 
-	for _, iata := range mapIata {
-		measures = nil
-		keys := bdd.GetAllKeyRegex(strings.ToUpper(iata) + "/" + captorName + "/*")
-		for _, key := range keys {
-			data := bdd.GetValue(key)
-			splitKey := strings.Split(key, "/")
-			measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
-		}
+	for _, key := range tabIata {
+		iata := strings.Split(key, "/")[0]
+		measures = createMeasure(bdd.GetValuesBetween2Index(key, 0, -1))
 		iataData = append(iataData, &Iata{IATA: iata, MEASURES: measures})
+		measures = nil
 	}
 
 	p, _ := json.Marshal(Captor{CAPTORNAME: captorName, VALUES: iataData})
@@ -159,7 +154,7 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 
 	data := bdd.GetValuesBetween2Index(iataCode+"/"+captorName, 0, -1)
 
-	createMeasure(data, measures)
+	measures = createMeasure(data)
 
 	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: measures})
 	w.Write(p)
@@ -268,23 +263,17 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 
 	var iataData []*Iata
 	var measures []*Measure
-	mapIata := config.CODE_IATA
 
 	startDate, _ := time.Parse("2006-01-02-15", start)
 	endDate, _ := time.Parse("2006-01-02-15", end)
 
-	startDateUnix := startDate.Unix()
-	endDateUnix := endDate.Unix()
+	tabIata := bdd.GetAllKeyRegex("*/" + captorName)
 
-	for _, iata := range mapIata {
-		measures = nil
-		for _, value := range bdd.GetValuesBetween2Score(iata+"/"+captorName, startDateUnix, endDateUnix) {
-			splitValue := strings.Split(value, ":")
-			dateUnixInt, _ := strconv.ParseInt(splitValue[0], 10, 64)
-			date := time.Unix(dateUnixInt, 0)
-			measures = append(measures, &Measure{DATE: date.Format("2006-01-02-15-04-05"), VALUE: splitValue[1]})
-		}
+	for _, key := range tabIata {
+		iata := strings.Split(key, "/")[0]
+		measures = createMeasure(bdd.GetValuesBetween2Score(key, startDate.Unix(), endDate.Unix()))
 		iataData = append(iataData, &Iata{IATA: iata, MEASURES: measures})
+		measures = nil
 	}
 
 	p, _ := json.Marshal(BetweenDate{START: start, END: end, CAPTORNAME: captorName, VALUES: iataData})
@@ -362,7 +351,8 @@ func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 
 // ------------------------------------------------------------------------------------------------------
 
-func createMeasure(data []string, measures []*Measure) []*Measure {
+func createMeasure(data []string) []*Measure {
+	var measures []*Measure
 	for _, value := range data {
 		splitValue := strings.Split(value, ":")
 		measures = append(measures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
