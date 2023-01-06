@@ -65,11 +65,9 @@ type DateAndAllCaptors struct {
 // @Success 200 {object} AllCaptors "AllCaptors JSON"
 // @Route /get/data-by-iata-code/{iataCode} [get]
 func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	iataCode := strings.ToUpper(vars["iataCode"])
+	iataCode := strings.ToUpper(mux.Vars(r)["iataCode"])
 
 	var pressureMeasures []*Measure
 	var temperatureMeasures []*Measure
@@ -79,18 +77,9 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 	dataTemperature := bdd.GetValuesBetween2Index(iataCode+"/TEMPERATURE", 0, -1)
 	dataWind := bdd.GetValuesBetween2Index(iataCode+"/WIND", 0, -1)
 
-	for _, value := range dataPressure {
-		splitValue := strings.Split(value, ":")
-		pressureMeasures = append(pressureMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
-	}
-	for _, value := range dataTemperature {
-		splitValue := strings.Split(value, ":")
-		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
-	}
-	for _, value := range dataWind {
-		splitValue := strings.Split(value, ":")
-		windMeasures = append(windMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
-	}
+	createMeasure(dataPressure, pressureMeasures)
+	createMeasure(dataTemperature, temperatureMeasures)
+	createMeasure(dataWind, windMeasures)
 
 	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
 	w.Write(p)
@@ -103,12 +92,10 @@ func GetDataByIataCode(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} AllCaptors "AllCaptors JSON"
 // @Route /get/data-by-iata-code-and-number/{iataCode}/{number} [get]
 func GetDataByIataCodeForXData(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	iataCode := strings.ToUpper(vars["iataCode"])
-	number, _ := strconv.ParseInt(vars["number"], 10, 64)
+	iataCode := strings.ToUpper(mux.Vars(r)["iataCode"])
+	number, _ := strconv.ParseInt(mux.Vars(r)["number"], 10, 64)
 
 	var pressureMeasures []*Measure
 	var temperatureMeasures []*Measure
@@ -118,18 +105,9 @@ func GetDataByIataCodeForXData(w http.ResponseWriter, r *http.Request) {
 	dataTemperature := bdd.GetValuesBetween2Index(iataCode+"/TEMPERATURE", -number, -1)
 	dataWind := bdd.GetValuesBetween2Index(iataCode+"/WIND", -number, -1)
 
-	for _, value := range dataPressure {
-		splitValue := strings.Split(value, ":")
-		pressureMeasures = append(pressureMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
-	}
-	for _, value := range dataTemperature {
-		splitValue := strings.Split(value, ":")
-		temperatureMeasures = append(temperatureMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
-	}
-	for _, value := range dataWind {
-		splitValue := strings.Split(value, ":")
-		windMeasures = append(windMeasures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
-	}
+	createMeasure(dataPressure, pressureMeasures)
+	createMeasure(dataTemperature, temperatureMeasures)
+	createMeasure(dataWind, windMeasures)
 
 	p, _ := json.Marshal(AllCaptors{IATA: iataCode, PRESSURE: pressureMeasures, TEMPERATURE: temperatureMeasures, WIND: windMeasures})
 	w.Write(p)
@@ -141,11 +119,9 @@ func GetDataByIataCodeForXData(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} Captor "Captor JSON"
 // @Route /get/data-by-captorName/{captorName} [get]
 func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	captorName := strings.ToUpper(vars["captorName"])
+	captorName := strings.ToUpper(mux.Vars(r)["captorName"])
 
 	var iataData []*Iata
 	var measures []*Measure
@@ -174,22 +150,17 @@ func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} CaptorAndIata "CaptorAndIata JSON"
 // @Route /get/data/{iataCode}/{captorName} [get]
 func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	iataCode := strings.ToUpper(vars["iataCode"])
-	captorName := strings.ToUpper(vars["captorName"])
+	iataCode := strings.ToUpper(mux.Vars(r)["iataCode"])
+	captorName := strings.ToUpper(mux.Vars(r)["captorName"])
 
 	var measures []*Measure
 
-	keys := bdd.GetAllKeyRegex(iataCode + "/" + captorName + "/*")
+	data := bdd.GetValuesBetween2Index(iataCode+"/"+captorName, 0, -1)
 
-	for _, key := range keys {
-		data := bdd.GetValue(key)
-		splitKey := strings.Split(key, "/")
-		measures = append(measures, &Measure{DATE: splitKey[2], VALUE: data})
-	}
+	createMeasure(data, measures)
+
 	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: measures})
 	w.Write(p)
 }
@@ -202,13 +173,11 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} CaptorAndIata "CaptorAndIata JSON"
 // @Route /get/data/{iataCode}/{captorName}/{year} [get]
 func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	iataCode := strings.ToUpper(vars["iataCode"])
-	captorName := strings.ToUpper(vars["captorName"])
-	year := vars["year"]
+	iataCode := strings.ToUpper(mux.Vars(r)["iataCode"])
+	captorName := strings.ToUpper(mux.Vars(r)["captorName"])
+	year := mux.Vars(r)["year"]
 
 	var measures []*Measure
 
@@ -232,14 +201,12 @@ func GetDataByIataCodeAndCaptorAndYear(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} CaptorAndIata "CaptorAndIata JSON"
 // @Route /get/data/{iataCode}/{captorName}/{year}/{month} [get]
 func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	iataCode := strings.ToUpper(vars["iataCode"])
-	captorName := strings.ToUpper(vars["captorName"])
-	year := vars["year"]
-	month := vars["month"]
+	iataCode := strings.ToUpper(mux.Vars(r)["iataCode"])
+	captorName := strings.ToUpper(mux.Vars(r)["captorName"])
+	year := mux.Vars(r)["year"]
+	month := mux.Vars(r)["month"]
 
 	var measures []*Measure
 
@@ -264,15 +231,13 @@ func GetDataByIataCodeAndCaptorAndYearAndMonth(w http.ResponseWriter, r *http.Re
 // @Success 200 {object} CaptorAndIata "CaptorAndIata JSON"
 // @Route /get/data/{iataCode}/{captorName}/{year}/{month}/{day} [get]
 func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	iataCode := strings.ToUpper(vars["iataCode"])
-	captorName := strings.ToUpper(vars["captorName"])
-	year := vars["year"]
-	month := vars["month"]
-	day := vars["day"]
+	iataCode := strings.ToUpper(mux.Vars(r)["iataCode"])
+	captorName := strings.ToUpper(mux.Vars(r)["captorName"])
+	year := mux.Vars(r)["year"]
+	month := mux.Vars(r)["month"]
+	day := mux.Vars(r)["day"]
 
 	var measures []*Measure
 
@@ -295,13 +260,11 @@ func GetDataByIataCodeAndCaptorAndYearAndMonthAndDay(w http.ResponseWriter, r *h
 // @Success 200 {object} BetweenDate "CaptorAndIata JSON"
 // @Route /get/data-between-dates/{captorName}/{start}/{end} [get]
 func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	captorName := strings.ToUpper(vars["captorName"])
-	start := vars["start"]
-	end := vars["end"]
+	captorName := strings.ToUpper(mux.Vars(r)["captorName"])
+	start := mux.Vars(r)["start"]
+	end := mux.Vars(r)["end"]
 
 	var iataData []*Iata
 	var measures []*Measure
@@ -334,11 +297,9 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} DateAndAllCaptors "CaptorAndIata JSON"
 // @Route /get/average-data/{date} [get]
 func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setHeader(w)
 
-	vars := mux.Vars(r)
-	date := vars["date"]
+	date := mux.Vars(r)["date"]
 
 	pressureSum := 0.0
 	temperatureSum := 0.0
@@ -397,4 +358,19 @@ func GetAverageByDate(w http.ResponseWriter, r *http.Request) {
 
 	j, _ := json.Marshal(DateAndAllCaptors{DATE: date, WIND: averageWind, TEMPERATURE: averageTemperature, PRESSURE: averagePressure})
 	w.Write(j)
+}
+
+// ------------------------------------------------------------------------------------------------------
+
+func createMeasure(data []string, measures []*Measure) []*Measure {
+	for _, value := range data {
+		splitValue := strings.Split(value, ":")
+		measures = append(measures, &Measure{DATE: splitValue[0], VALUE: splitValue[1]})
+	}
+	return measures
+}
+
+func setHeader(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 }
