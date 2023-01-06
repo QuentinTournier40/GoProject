@@ -80,6 +80,7 @@ $(function () {
         const temperatureChart = document.getElementById('temperatureChart');
         const windChart = document.getElementById('windChart');
         const pressureChart = document.getElementById('pressureChart');
+        const airportTitle = document.getElementById('airportTitle');
 
         let temperatureChartObject;
         let pressureChartObject;
@@ -107,7 +108,8 @@ $(function () {
 
         // load first chart datas
         function loadChart() {
-            getDataByAirport(selectedIata.value).then(data => {
+            airportTitle.innerHTML = `Aiport ${selectedIata.value} data`;
+            getDataByAirport(selectedIata.value, 10).then(data => {
                 if (temperatureChartObject) {
                     temperatureChartObject.destroy();
                 }
@@ -205,8 +207,8 @@ $(function () {
         }
 
         // get 10 latest values for each 3 captors of the given airport
-        async function getDataByAirport(iata) {
-            let request = new Request(`http://localhost:8080/get/data-by-iata-code-and-number/${iata}/10`, {
+        async function getDataByAirport(iata, value) {
+            let request = new Request(`http://localhost:8080/get/data-by-iata-code-and-number/${iata}/${value}`, {
                 method: 'GET',
                 headers: new Headers()
             });
@@ -223,7 +225,7 @@ $(function () {
         // display data of an airport        
         function printAirportData() {
             const selectedIata = document.getElementById("selectedIata");
-            getDataByAirport(selectedIata.value).then(value => {
+            getDataByAirport(selectedIata.value, 1).then(value => {
                 // Init chart data
                 let titles = ["Temperature", "Pressure", "Wind"];
                 let mesures = ["ºC", "hPa", "km/h"];
@@ -248,8 +250,7 @@ $(function () {
 
                 // update data of the charts
                 function updateData() {
-                    getDataByAirport(selectedIata.value).then(value => {
-
+                    getDataByAirport(selectedIata.value, 1).then(value => {
                         // remove the first point and add a new one at the end
                         if (temperatureChartObject.data.labels.length >= 9) {
                             removeData(temperatureChartObject);
@@ -285,9 +286,6 @@ $(function () {
                         });
                     });
                 }
-                $('#random').click(function () {
-                    updateData();
-                });
                 loadChart();
                 intervalId = setInterval(() => { updateData() }, 5000);
             });
