@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	publishers.RunPublisher("WIND", 2, 0, 250)
+	publishers.RunPublisher("WIND", 2, 0, 200)
 }
