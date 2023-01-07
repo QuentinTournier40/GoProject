@@ -2,22 +2,19 @@ package router
 
 import (
 	"github.com/gorilla/mux"
-	"goproject/api/captorService"
+	"goproject/api/apiService"
 	"log"
 	"net/http"
 )
 
 func HandleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/get/data-by-iata-code/{iataCode}", captorService.GetDataByIataCode).Methods("GET")                                                    // /iata/{code}
-	myRouter.HandleFunc("/get/data-by-iata-code-and-number/{iataCode}/{number}", captorService.GetDataByIataCodeForXData).Methods("GET")                        // /iata/{code}/values/{num}
-	myRouter.HandleFunc("/get/data-by-captorName/{captorName}", captorService.GetDataByCaptor).Methods("GET")                                                   // /sensor/{name}
-	myRouter.HandleFunc("/get/data-between-dates/{captorName}/{start}/{end}", captorService.GetDataBetweenDates).Methods("GET")                                 // /values/between/{start_date}/to/{end_date}
-	myRouter.HandleFunc("/get/average-data/{date}", captorService.GetAverageByDate).Methods("GET")                                                              // /values/average/{date}
-	myRouter.HandleFunc("/get/data/{iataCode}/{captorName}", captorService.GetDataByIataCodeAndCaptor).Methods("GET")                                           //
-	myRouter.HandleFunc("/get/data/{iataCode}/{captorName}/{year}", captorService.GetDataByIataCodeAndCaptorAndYear).Methods("GET")                             //
-	myRouter.HandleFunc("/get/data/{iataCode}/{captorName}/{year}/{month}", captorService.GetDataByIataCodeAndCaptorAndYearAndMonth).Methods("GET")             //
-	myRouter.HandleFunc("/get/data/{iataCode}/{captorName}/{year}/{month}/{day}", captorService.GetDataByIataCodeAndCaptorAndYearAndMonthAndDay).Methods("GET") //
+	myRouter.HandleFunc("/iata/{code}", apiService.GetDataByIataCode).Methods("GET")                                              //  /get/data-by-iata-code/{iataCode}
+	myRouter.HandleFunc("/iata/{code}/number/{number}", apiService.GetDataByIataCodeForXData).Methods("GET")                      // /iata/{code}/number/{num} /get/data-by-iata-code-and-number/{iataCode}/{number}
+	myRouter.HandleFunc("/sensor/{sensorName}", apiService.GetDataByCaptor).Methods("GET")                                        // /sensor/{sensorName} /get/data-by-captorName/{captorName}
+	myRouter.HandleFunc("/iata/{code}/sensor/{sensorName}", apiService.GetDataByIataCodeAndCaptor).Methods("GET")                 //  /get/data/{iataCode}/{captorName}
+	myRouter.HandleFunc("/sensor/{sensorName}/between/{start_date}/to/{end_date}", apiService.GetDataBetweenDates).Methods("GET") // /sensor/{sensorName}/between/{start_date}/to/{end_date} /get/data-between-dates/{captorName}/{start}/{end}
+	myRouter.HandleFunc("/averages/{date}", apiService.GetAverageByDate).Methods("GET")                                           //  /get/average-data/{date}
 	log.Println("Server listening on localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", myRouter))
 }

@@ -34,7 +34,7 @@ func subscribeApi(client mqtt.Client, topic string) {
 	client.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
 		strMsg := strings.Split(string(msg.Payload()), " ")
 		date, _ := time.Parse("2006-01-02-15-04-05", strMsg[4])
-		dataRedis := strMsg[4] + ":" + strMsg[3]
+		dataRedis := strMsg[4] + ":" + strMsg[3] + ":" + strMsg[0]
 		bdd.AddToSortedSet(strMsg[1]+"/"+strMsg[2], date.Unix(), dataRedis)
 	})
 }
@@ -43,7 +43,7 @@ func subscribeCsv(client mqtt.Client, topic string) {
 	var mapCsv = map[string][]string{}
 
 	job := gocron.NewScheduler(time.UTC)
-	job.Every(10).Minutes().Do(func() {
+	job.Every(1).Day().Do(func() {
 		createCsvFiles(mapCsv)
 	})
 	job.StartAsync()

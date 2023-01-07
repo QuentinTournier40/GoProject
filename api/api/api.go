@@ -3,10 +3,8 @@ package main
 import "goproject/api/router"
 
 // @Version 1.0.0
-// @Title Temperature/Pressure/Wind of airports API
+// @Title API de données de capteurs d'aeroports
 // @Description l'API expose les données générées par nos publishers
-// @ContactName TOURNIER Quentin
-// @ContactEmail qttournier@gmail.com
 func main() {
 	router.HandleRequests()
 }

@@ -40,8 +40,7 @@ func RunPublisher(captorFullNameUpperCase string, captorId int, minValue, maxVal
 	for {
 		for key, value := range mapIata {
 			tabValue[key] = generateCoherenteValue(tabValue[key], minValue, maxValue)
-			now := time.Now()
-			msg := strconv.FormatInt(int64(3*key+captorId), 10) + " " + value + " " + captorFullNameUpperCase + " " + fmt.Sprintf("%.1f", tabValue[key]) + " " + now.Format("2006-01-02-15-04-05")
+			msg := strconv.FormatInt(int64(3*key+captorId), 10) + " " + value + " " + captorFullNameUpperCase + " " + fmt.Sprintf("%.1f", tabValue[key]) + " " + time.Now().Format("2006-01-02-15-04-05")
 			client.Publish(topic, configuration.QOS, false, msg)
 			log.Println(msg)
 		}
@@ -49,7 +48,7 @@ func RunPublisher(captorFullNameUpperCase string, captorId int, minValue, maxVal
 	}
 }
 
-func generateCoherenteValue(value float64, min, max float64) float64 {
+func generateCoherenteValue(value, min, max float64) float64 {
 	offset := rand.Float64()*6 - 3
 	result := value + offset
 

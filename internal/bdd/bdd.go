@@ -5,16 +5,6 @@ import (
 	"log"
 )
 
-func SetValue(key, value string) {
-	conn, err := redis.Dial("tcp", "localhost:6379")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer conn.Close()
-	_, err = redis.String(conn.Do("SET", key, value))
-}
-
 func GetValue(key string) string {
 	conn, err := redis.Dial("tcp", "localhost:6379")
 	if err != nil {
@@ -58,7 +48,7 @@ func GetValuesBetween2Index(name string, firstIndex, secondIndex int64) []string
 		log.Fatal(err)
 	}
 
-	return scanMap(r)
+	return scanSlice(r)
 }
 
 func GetValuesBetween2Score(name string, firstScore, secondScore int64) []string {
@@ -74,7 +64,7 @@ func GetValuesBetween2Score(name string, firstScore, secondScore int64) []string
 		log.Fatal(err)
 	}
 
-	return scanMap(r)
+	return scanSlice(r)
 }
 
 func GetAllKeyRegex(expression string) []string {
@@ -90,7 +80,7 @@ func GetAllKeyRegex(expression string) []string {
 	return r
 }
 
-func scanMap(values []interface{}) []string {
+func scanSlice(values []interface{}) []string {
 	var results []string
 	var err error
 

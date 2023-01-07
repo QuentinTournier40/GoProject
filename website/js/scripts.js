@@ -108,7 +108,7 @@ $(function () {
 
         // load first chart datas
         function loadChart() {
-            airportTitle.innerHTML = `Aiport ${selectedIata.value} data`;
+            airportTitle.innerHTML = `Airport ${selectedIata.value} data`;
             getDataByAirport(selectedIata.value, 10).then(data => {
                 if (temperatureChartObject) {
                     temperatureChartObject.destroy();
@@ -133,7 +133,7 @@ $(function () {
                             }),
                             borderWidth: 2,
                             pointRadius: 4,
-                            tension: 0.3
+                            tension: 0.3,
                         },
                         ]
                     },
@@ -142,7 +142,7 @@ $(function () {
                             legend: {
                                 display: false,
                             }
-                        }
+                        },
                     }
                 });
                 windChartObject = new Chart(windChart, {
@@ -172,7 +172,7 @@ $(function () {
                             }
                         }
                     }
-                });
+                })
                 pressureChartObject = new Chart(pressureChart, {
                     type: 'line',
                     data: {
@@ -208,7 +208,7 @@ $(function () {
 
         // get 10 latest values for each 3 captors of the given airport
         async function getDataByAirport(iata, value) {
-            let request = new Request(`http://localhost:8080/get/data-by-iata-code-and-number/${iata}/${value}`, {
+            let request = new Request(`http://localhost:8080/iata/${iata}/number/${value}`, {
                 method: 'GET',
                 headers: new Headers()
             });
