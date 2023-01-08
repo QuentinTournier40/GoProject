@@ -23,15 +23,15 @@ Importer le contenu du fichier [***/api/spec/open-api-spec.yaml***](https://gith
 
 
 ## 🛠 Compétences
-[GoLang](https://go.dev/doc/)
-[RediGo](https://github.com/gomodule/redigo)
-[Gorilla Mux](https://github.com/gorilla/mux)
-[GoCron](https://github.com/go-co-op/gocron)
-[Swagger](https://swagger.io/)
-[GoPaho](https://github.com/eclipse/paho.mqtt.golang)
-[JavaScript](https://developer.mozilla.org/fr/docs/Web/JavaScript)
-[HTML](https://developer.mozilla.org/fr/docs/Web/HTML)
-[CSS](https://developer.mozilla.org/fr/docs/Web/CSS)
+[GoLang](https://go.dev/doc/)  
+[RediGo](https://github.com/gomodule/redigo)  
+[Gorilla Mux](https://github.com/gorilla/mux)  
+[GoCron](https://github.com/go-co-op/gocron)  
+[Swagger](https://swagger.io/)  
+[GoPaho](https://github.com/eclipse/paho.mqtt.golang)  
+[JavaScript](https://developer.mozilla.org/fr/docs/Web/JavaScript)  
+[HTML](https://developer.mozilla.org/fr/docs/Web/HTML)  
+[CSS](https://developer.mozilla.org/fr/docs/Web/CSS)  
 
 
 ## Auteurs
