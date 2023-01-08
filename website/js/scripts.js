@@ -230,9 +230,9 @@ $(function () {
                 let titles = ["Temperature", "Pressure", "Wind"];
                 let mesures = ["ºC", "hPa", "km/h"];
                 let minValue = [-15, 950, 0];
-                let maxValue = [45, 1030, 250];
+                let maxValue = [45, 1030, 200];
                 let initialValue = [value.temperature[value.temperature.length - 1].value, value.pressure[value.pressure.length - 1].value, value.wind[value.wind.length - 1].value];
-                let customTicks = [[-15, -10, -5, 0, 5, 10, 20, 30, 45], [950, 960, 970, 980, 990, 1000, 1010, 1020, 1030], [0, 50, 100, 150, 200, 250]];
+                let customTicks = [[-15, -10, -5, 0, 5, 10, 20, 30, 45], [950, 960, 970, 980, 990, 1000, 1010, 1020, 1030], [0, 50, 100, 150, 200]];
 
                 $('.gauge').each(function (index, item) {
                     let params = {

@@ -5,21 +5,6 @@ import (
 	"log"
 )
 
-func GetValue(key string) string {
-	conn, err := redis.Dial("tcp", "localhost:6379")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer conn.Close()
-
-	r, err := redis.String(conn.Do("GET", key))
-	if err != nil {
-		log.Fatal(err)
-	}
-	return r
-}
-
 func AddToSortedSet(name string, score int64, value string) int64 {
 	conn, err := redis.Dial("tcp", "localhost:6379")
 	if err != nil {

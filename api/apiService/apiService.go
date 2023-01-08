@@ -124,9 +124,9 @@ func GetDataByCaptor(w http.ResponseWriter, r *http.Request) {
 	var iataData []*Iata
 	var measures []*Measure
 
-	tabIata := bdd.GetAllKeyRegex("*/" + sensorName)
+	tabKeys := bdd.GetAllKeyRegex("*/" + sensorName)
 
-	for _, key := range tabIata {
+	for _, key := range tabKeys {
 		iata := strings.Split(key, "/")[0]
 		measures = createMeasure(bdd.GetValuesBetween2Index(key, 0, -1))
 		iataData = append(iataData, &Iata{IATA: iata, MEASURES: measures})
@@ -147,15 +147,15 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 	setHeader(w)
 
 	iataCode := strings.ToUpper(mux.Vars(r)["code"])
-	captorName := strings.ToUpper(mux.Vars(r)["sensorName"])
+	sensorName := strings.ToUpper(mux.Vars(r)["sensorName"])
 
 	var measures []*Measure
 
-	data := bdd.GetValuesBetween2Index(iataCode+"/"+captorName, 0, -1)
+	data := bdd.GetValuesBetween2Index(iataCode+"/"+sensorName, 0, -1)
 
 	measures = createMeasure(data)
 
-	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: captorName, VALUES: measures})
+	p, _ := json.Marshal(CaptorAndIata{IATA: iataCode, CAPTORNAME: sensorName, VALUES: measures})
 	w.Write(p)
 }
 
@@ -169,14 +169,14 @@ func GetDataByIataCodeAndCaptor(w http.ResponseWriter, r *http.Request) {
 func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 	setHeader(w)
 
-	captorName := strings.ToUpper(mux.Vars(r)["sensorName"])
+	sensorName := strings.ToUpper(mux.Vars(r)["sensorName"])
 	startDate, _ := time.Parse("2006-01-02-15", mux.Vars(r)["start_date"])
 	endDate, _ := time.Parse("2006-01-02-15", mux.Vars(r)["end_date"])
 
 	var iataData []*Iata
 	var measures []*Measure
 
-	tabIata := bdd.GetAllKeyRegex("*/" + captorName)
+	tabIata := bdd.GetAllKeyRegex("*/" + sensorName)
 
 	for _, key := range tabIata {
 		iata := strings.Split(key, "/")[0]
@@ -185,7 +185,7 @@ func GetDataBetweenDates(w http.ResponseWriter, r *http.Request) {
 		measures = nil
 	}
 
-	p, _ := json.Marshal(BetweenDate{START: mux.Vars(r)["start_date"], END: mux.Vars(r)["end_date"], CAPTORNAME: captorName, VALUES: iataData})
+	p, _ := json.Marshal(BetweenDate{START: mux.Vars(r)["start_date"], END: mux.Vars(r)["end_date"], CAPTORNAME: sensorName, VALUES: iataData})
 	w.Write(p)
 }
 
@@ -227,9 +227,8 @@ func setHeader(w http.ResponseWriter) {
 }
 
 func getAverage(sensorName string, startUnix, endUnix int64) float64 {
-	sum := 0.0
+	sum, average := 0.0, math.SmallestNonzeroFloat64
 	cpt := 0
-	average := math.SmallestNonzeroFloat64
 	for _, key := range bdd.GetAllKeyRegex("*/" + sensorName) {
 		for _, value := range bdd.GetValuesBetween2Score(key, startUnix, endUnix) {
 			splitValue := strings.Split(value, ":")
