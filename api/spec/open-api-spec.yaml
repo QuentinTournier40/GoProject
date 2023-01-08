@@ -130,7 +130,7 @@ components:
           example: 25.3
           type: number
         wind:
-          description: Valeur moyenne des données de votesse du vent
+          description: Valeur moyenne des données de vitesse du vent
           example: 60.2
           type: number
       type: object
@@ -161,17 +161,14 @@ components:
           type: string
       type: object
 info:
-  contact:
-    email: qttournier@gmail.com
-    name: TOURNIER Quentin
   description: l'API expose les données générées par nos publishers
-  title: Temperature/Pressure/Wind of airports API
+  title: API de données de capteurs d'aeroports
   version: 1.0.0
 openapi: 3.0.0
 paths:
-  /get/average-data/{date}:
+  /averages/{date}:
     get:
-      description: ' Obtenir la moyenne de tous les releves d''un jour donné.'
+      description: ' Obtenir la moyenne de tous les relevés d''un jour donné.'
       parameters:
       - description: Date
         in: path
@@ -188,71 +185,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/DateAndAllCaptors'
           description: CaptorAndIata JSON
-      summary: Get average data from all captor on specific day
-  /get/data-between-dates/{captorName}/{start}/{end}:
+      summary: GetAverageByDate
+  /iata/{code}:
     get:
-      description: ' Obtenir tous les relevés de mesure d un type de capteur dans
-        une plage de temps donnée.'
-      parameters:
-      - description: Captor name
-        in: path
-        name: captorName
-        required: true
-        schema:
-          description: Captor name
-          format: string
-          type: string
-      - description: Start
-        in: path
-        name: start
-        required: true
-        schema:
-          description: Start
-          format: string
-          type: string
-      - description: End
-        in: path
-        name: end
-        required: true
-        schema:
-          description: End
-          format: string
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BetweenDate'
-          description: CaptorAndIata JSON
-      summary: Get data between 2 dates
-  /get/data-by-captorName/{captorName}:
-    get:
-      description: ' Obtenir tous les relevés de mesure d''un type de capteur'
-      parameters:
-      - description: Captor name
-        in: path
-        name: captorName
-        required: true
-        schema:
-          description: Captor name
-          format: string
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Captor'
-          description: Captor JSON
-      summary: Get all data by captor
-  /get/data-by-iata-code-and-number/{iataCode}/{number}:
-    get:
-      description: ' Obtenir un nombre donnée de relevés de mesure selon un code iata'
+      description: ' Obtenir tous les relevés de mesure selon un code iata'
       parameters:
       - description: Code iata
         in: path
-        name: iataCode
+        name: code
+        required: true
+        schema:
+          description: Code iata
+          format: string
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllCaptors'
+          description: AllCaptors JSON
+      summary: GetDataByIataCode
+  /iata/{code}/number/{number}:
+    get:
+      description: ' Obtenir un nombre donné de relevés de mesure selon un code iata'
+      parameters:
+      - description: Code iata
+        in: path
+        name: code
         required: true
         schema:
           description: Code iata
@@ -273,46 +233,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/AllCaptors'
           description: AllCaptors JSON
-      summary: Get amount of data by iata code
-  /get/data-by-iata-code/{iataCode}:
-    get:
-      description: ' Obtenir tous les relevés de mesure selon un code iata'
-      parameters:
-      - description: Code iata
-        in: path
-        name: iataCode
-        required: true
-        schema:
-          description: Code iata
-          format: string
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AllCaptors'
-          description: AllCaptors JSON
-      summary: Get all data by iata code
-  /get/data/{iataCode}/{captorName}:
+      summary: GetDataByIataCodeForXData
+  /iata/{code}/sensor/{sensorName}:
     get:
       description: ' Obtenir tous les relevés de mesure d''un aeroport et d un seul
         type de capteur.'
       parameters:
-      - description: Captor name
-        in: path
-        name: captorName
-        required: true
-        schema:
-          description: Captor name
-          format: string
-          type: string
       - description: Code iata
         in: path
-        name: iataCode
+        name: code
         required: true
         schema:
           description: Code iata
+          format: string
+          type: string
+      - description: Captor name
+        in: path
+        name: sensorName
+        required: true
+        schema:
+          description: Captor name
           format: string
           type: string
       responses:
@@ -322,34 +262,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/CaptorAndIata'
           description: CaptorAndIata JSON
-      summary: Get data by iata code and captor name
-  /get/data/{iataCode}/{captorName}/{year}:
+      summary: GetDataByIataCodeAndCaptor
+  /sensor/{sensorName}:
     get:
-      description: ' Obtenir tous les relevés de mesure d''un aeroport et d un seul
-        type de capteur d une année precise.'
+      description: ' Obtenir tous les relevés de mesure d''un type de capteur'
       parameters:
       - description: Captor name
         in: path
-        name: captorName
+        name: sensorName
         required: true
         schema:
           description: Captor name
-          format: string
-          type: string
-      - description: Code iata
-        in: path
-        name: iataCode
-        required: true
-        schema:
-          description: Code iata
-          format: string
-          type: string
-      - description: Year
-        in: path
-        name: year
-        required: true
-        schema:
-          description: Year
           format: string
           type: string
       responses:
@@ -357,44 +280,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CaptorAndIata'
-          description: CaptorAndIata JSON
-      summary: Get data by iata code, captor name and year
-  /get/data/{iataCode}/{captorName}/{year}/{month}:
+                $ref: '#/components/schemas/Captor'
+          description: Captor JSON
+      summary: GetDataByCaptor
+  /sensor/{sensorName}/between/{start_date}/to/{end_date}:
     get:
-      description: ' Obtenir tous les relevés de mesure d''un aeroport et d''un seul
-        type de capteur d une année et d un mois precis.'
+      description: ' Obtenir tous les relevés de mesure d un type de capteur dans
+        une plage de temps donnée.'
       parameters:
       - description: Captor name
         in: path
-        name: captorName
+        name: sensorName
         required: true
         schema:
           description: Captor name
           format: string
           type: string
-      - description: Code iata
+      - description: Start
         in: path
-        name: iataCode
+        name: start_date
         required: true
         schema:
-          description: Code iata
+          description: Start
           format: string
           type: string
-      - description: Year
+      - description: End
         in: path
-        name: year
+        name: end_date
         required: true
         schema:
-          description: Year
-          format: string
-          type: string
-      - description: Month
-        in: path
-        name: month
-        required: true
-        schema:
-          description: Month
+          description: End
           format: string
           type: string
       responses:
@@ -402,62 +317,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CaptorAndIata'
+                $ref: '#/components/schemas/BetweenDate'
           description: CaptorAndIata JSON
-      summary: Get data by iata code, captor name, year and month
-  /get/data/{iataCode}/{captorName}/{year}/{month}/{day}:
-    get:
-      description: ' Obtenir tous les relevés de mesure d un aeroport et d un seul
-        type de capteur d une année, d un mois et d un jour precis.'
-      parameters:
-      - description: Captor name
-        in: path
-        name: captorName
-        required: true
-        schema:
-          description: Captor name
-          format: string
-          type: string
-      - description: Code iata
-        in: path
-        name: iataCode
-        required: true
-        schema:
-          description: Code iata
-          format: string
-          type: string
-      - description: Year
-        in: path
-        name: year
-        required: true
-        schema:
-          description: Year
-          format: string
-          type: string
-      - description: Month
-        in: path
-        name: month
-        required: true
-        schema:
-          description: Month
-          format: string
-          type: string
-      - description: Day
-        in: path
-        name: day
-        required: true
-        schema:
-          description: Day
-          format: string
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CaptorAndIata'
-          description: CaptorAndIata JSON
-      summary: Get data by iata code, captor name, year, month and day
+      summary: GetDataBetweenDates
 servers:
 - description: Default Server URL
   url: /
