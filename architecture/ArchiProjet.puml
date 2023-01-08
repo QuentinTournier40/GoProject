@@ -49,7 +49,7 @@ database "REDIS"{
 
 file "CSV"
 
-User -left- HTTP : "REST/MVC"
+User <-left-> HTTP : "REST/Web"
 HTTP -down- [captorService] : router
 [captorService] -down-> [Data]: "get"
 

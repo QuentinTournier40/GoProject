@@ -36,8 +36,8 @@ file "CSV"
 [subscriberCsv] <-up- "MQTT Broker": "publish data"
 [subscriberCsv] -up-> "MQTT Broker": "subscribe"
 "MQTT Broker" <-up- [Wind]: "publish wind"
-"MQTT Broker" <-up- [Pressure]: "publish Pressure"
-"MQTT Broker" <-up- [Temperature]: "publish Temperature"
+"MQTT Broker" <-up- [Pressure]: "publish pressure"
+"MQTT Broker" <-up- [Temperature]: "publish temperature"
 
 
 

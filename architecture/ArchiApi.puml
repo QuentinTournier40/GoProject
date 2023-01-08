@@ -21,10 +21,10 @@ database "REDIS"{
     [Data]
 }
 
-User1 -left- HTTP : "REST client"
-User2 -right- HTTP : "Dashboard"
-HTTP -down- 8080 : "api calls"
-api -down-> [Data]: "get"
+User1 <-left-> HTTP : "REST client"
+User2 <-right-> HTTP : "Dashboard"
+HTTP <-down-> 8080 : "api calls"
+api <-down-> [Data]: "get"
 
 
 
