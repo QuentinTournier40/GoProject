@@ -43,8 +43,9 @@ func subscribeCsv(client mqtt.Client, topic string) {
 	var mapCsv = map[string][]string{}
 
 	job := gocron.NewScheduler(time.UTC)
-	job.Every(1).Day().Do(func() {
+	job.Cron("0 0 * * *").Do(func() {
 		createCsvFiles(mapCsv)
+		maps.Clear(mapCsv)
 	})
 	job.StartAsync()
 
@@ -68,5 +69,4 @@ func createCsvFiles(mapCsv map[string][]string) {
 		}
 		csvFile.Close()
 	}
-	maps.Clear(mapCsv)
 }
