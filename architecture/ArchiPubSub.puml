@@ -1,0 +1,49 @@
+@startuml
+
+package "CMD" {
+    package "Pub" {
+        [Wind]
+        [Temperature]
+        [Pressure]
+
+
+    }
+    package "Sub" {
+        [subscriberApi]
+        [subscriberCsv]
+
+    }
+    interface "MQTT Broker"
+}
+
+
+
+database "REDIS"{
+    [Data]
+
+}
+
+file "CSV"
+
+
+
+[subscriberApi] -down-> [Data]: "feed"
+[subscriberCsv] -down-> "CSV": "generate"
+
+[subscriberApi] -up-> "MQTT Broker": "subscribe"
+
+[subscriberApi] <-up- "MQTT Broker" : "publish data"
+[subscriberCsv] <-up- "MQTT Broker": "publish data"
+[subscriberCsv] -up-> "MQTT Broker": "subscribe"
+"MQTT Broker" <-up- [Wind]: "publish wind"
+"MQTT Broker" <-up- [Pressure]: "publish Pressure"
+"MQTT Broker" <-up- [Temperature]: "publish Temperature"
+
+
+
+
+
+
+
+
+@enduml

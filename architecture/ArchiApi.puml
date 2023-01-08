@@ -1,0 +1,38 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+interface HTTP
+
+skinparam actorStyle awesome
+actor User1
+actor User2
+
+
+component "api" {
+port 8080
+
+}
+
+
+
+
+
+database "REDIS"{
+    [Data]
+}
+
+User1 -left- HTTP : "REST client"
+User2 -right- HTTP : "Dashboard"
+HTTP -down- 8080 : "api calls"
+api -down-> [Data]: "get"
+
+
+
+
+
+
+
+
+
+
+@enduml
