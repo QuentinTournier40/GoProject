@@ -25,7 +25,6 @@ files=$(ls)
 
 while [ true ]
 do
-
   i=0
   for file in $files; do
     i=$((i+1))
@@ -44,15 +43,16 @@ do
   # Si l'utilisateur a saisi 0, on exécute tous les fichiers
   if [ $file_number -eq 0 ]
   then
-    for file in $files
-    do
-      start $file
-    done
+    start api.exe
+    start subscriber_api.exe
+    start subscriber_csv.exe
+    start pressure.exe
+    start temp.exe
+    start wind.exe
     exit
   fi
 
   selected_file=$(echo "$files" | sed -n "${file_number}p")
   start $selected_file
-  read -p "Appuyez sur une touche pour continuer..."
 done
 
